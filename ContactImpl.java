@@ -11,6 +11,9 @@ public class ContactImpl implements Contact {
 	public ContactImpl(int id, String name) {
 		this(id, name, "");
 	}
+	public ContactImpl(Contact contact) {
+		this(contact.getId(), contact.getName(), contact.getNotes());
+	}
 	public int getId() {
 		return id;
 	}

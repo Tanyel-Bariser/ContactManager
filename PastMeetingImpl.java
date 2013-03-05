@@ -8,8 +8,9 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 		super(id, date, contacts);
 		notes += note;
 	}
-	public PastMeetingImpl(Meeting meeting) {
+	public PastMeetingImpl(Meeting meeting, String note) {
 		super(meeting.getId(), meeting.getDate(), meeting.getContacts());
+		notes += note;
 	}
 	public String getNotes() {
 		return notes;

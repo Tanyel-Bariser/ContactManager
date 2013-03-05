@@ -11,6 +11,9 @@ public class MeetingImpl implements Meeting {
 		this.date = date;
 		this.contacts = contacts;
 	}
+	public MeetingImpl(Meeting meeting) {
+		this(meeting.getId(), meeting.getDate(), meeting.getContacts());
+	}
 	public int getId() {
 		return id;
 	}

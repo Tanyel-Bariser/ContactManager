@@ -6,7 +6,7 @@ public class ContactImpl implements Contact {
 	public ContactImpl(int id, String name, String notes) {
 		this.id = id;
 		this.name = name;
-		this.notes = notes;
+		this.notes = notes + "\n";
 	}
 	public ContactImpl(int id, String name) {
 		this(id, name, "");
@@ -24,7 +24,7 @@ public class ContactImpl implements Contact {
 		return notes;
 	}
 	public void addNotes(String note) {
-		notes += note;
+		notes += note + "\n";
 	}
 	public boolean equals(Contact otherContact) {
 		boolean equal = false;

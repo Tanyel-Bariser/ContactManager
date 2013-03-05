@@ -1,13 +1,15 @@
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ContactTest {
-	private Contact contact;
+	private ContactImpl contact, contactSame;
 
 	@Before
 	public void buildUp() {
 		contact = new ContactImpl(4, "Tanyel", "TestNote");
+		contactSame = new ContactImpl(4, "Tanyel", "TestNote");
 	}
 	@Test
 	public void testsGetId() {
@@ -25,5 +27,9 @@ public class ContactTest {
 	public void testsAddNotes() {
 		contact.addNotes("&MoreNotes");
 		assertEquals(contact.getNotes(), "TestNote&MoreNotes");
+	}
+	@Test
+	public void testsEquals() {
+		assertTrue(contact.equals(contactSame));
 	}
 }

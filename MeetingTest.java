@@ -10,7 +10,7 @@ import java.util.Calendar;
 public class MeetingTest {
 	private Contact contact1, contact2;
 	private Set<Contact> contacts;
-	private Meeting meeting;
+	private Meeting meeting, meetingSame;
 	private Calendar date;
 	
 	@Before
@@ -22,6 +22,7 @@ public class MeetingTest {
 		contacts.add(contact2);
 		date = Calendar.getInstance();
 		meeting = new MeetingImpl(1, date, contacts);
+		meetingSame = new MeetingImpl(1, date, contacts);
 	}
 	@Test
 	public void testsGetId() {
@@ -34,5 +35,9 @@ public class MeetingTest {
 	@Test
 	public void testsGetContacts() {
 		assertEquals(contacts, meeting.getContacts());
+	}
+	@Test
+	public void testsEquals() {
+		assertTrue(meeting.equals(meetingSame));
 	}
 }

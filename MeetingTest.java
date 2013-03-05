@@ -10,7 +10,7 @@ import java.util.Calendar;
 public class MeetingTest {
 	private Contact contact1, contact2;
 	private Set<Contact> contacts;
-	private Meeting meeting, meetingSame;
+	private MeetingImpl meeting, meetingSame;
 	private Calendar date;
 	
 	@Before

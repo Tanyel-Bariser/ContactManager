@@ -1,7 +1,7 @@
 import java.util.Calendar;
 import java.util.Set;
 
-public abstract class MeetingImpl implements Meeting {
+public class MeetingImpl implements Meeting {
 	private int id;
 	private Calendar date;
 	private Set<Contact> contacts;
@@ -19,5 +19,12 @@ public abstract class MeetingImpl implements Meeting {
 	}
 	public Set<Contact> getContacts() {
 		return contacts;
+	}
+	public boolean equals(Meeting otherMeeting) {
+		boolean equal = false;
+		equal = getId() == otherMeeting.getId();
+		equal = equal && getDate().equals(otherMeeting.getDate());
+		equal = equal && getContacts().equals(otherMeeting.getContacts());
+		return equal;
 	}
 }

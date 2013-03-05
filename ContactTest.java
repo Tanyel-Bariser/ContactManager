@@ -9,7 +9,6 @@ public class ContactTest {
 	@Before
 	public void buildUp() {
 		contact = new ContactImpl(4, "Tanyel", "TestNote");
-		contactSame = new ContactImpl(4, "Tanyel", "TestNote");
 	}
 	@Test
 	public void testsGetId() {
@@ -30,6 +29,7 @@ public class ContactTest {
 	}
 	@Test
 	public void testsEquals() {
+		contactSame = new ContactImpl(contact);
 		assertTrue(contact.equals(contactSame));
 	}
 }

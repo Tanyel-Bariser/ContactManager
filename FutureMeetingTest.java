@@ -22,7 +22,7 @@ public class FutureMeetingTest {
 		contacts.add(contact2);
 		date = Calendar.getInstance();
 		meeting = new FutureMeetingImpl(1, date, contacts);
-		meetingSame = new FutureMeetingImpl(1, date, contacts);
+		meetingSame = new FutureMeetingImpl(meeting);
 	}
 	@Test
 	public void testsGetId() {

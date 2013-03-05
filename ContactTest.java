@@ -20,12 +20,12 @@ public class ContactTest {
 	}
 	@Test
 	public void testsGetNotes() {
-		assertEquals(contact.getNotes(), "TestNote");
+		assertEquals(contact.getNotes(), "TestNote\n");
 	}
 	@Test
 	public void testsAddNotes() {
 		contact.addNotes("&MoreNotes");
-		assertEquals(contact.getNotes(), "TestNote&MoreNotes");
+		assertEquals(contact.getNotes(), "TestNote\n&MoreNotes\n");
 	}
 	@Test
 	public void testsEquals() {

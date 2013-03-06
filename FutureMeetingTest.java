@@ -21,7 +21,7 @@ public class FutureMeetingTest {
 		contacts.add(contact1);
 		contacts.add(contact2);
 		date = Calendar.getInstance();
-		meeting = new FutureMeetingImpl(1, date, contacts);
+		meeting = new FutureMeetingImpl(1, contacts, date);
 		meetingSame = new FutureMeetingImpl(meeting);
 	}
 	@Test

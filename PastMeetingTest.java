@@ -38,7 +38,7 @@ public class PastMeetingTest {
 	}
 	@Test
 	public void testsGetNotes() {
-		assertEquals(meeting.getNotes(), "MeetingNotes");
+		assertEquals(meeting.getNotes(), "MeetingNotes\n");
 	}
 	@Test
 	public void testsEquals() {

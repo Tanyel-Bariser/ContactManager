@@ -6,13 +6,13 @@ public class MeetingImpl implements Meeting {
 	private Calendar date;
 	private Set<Contact> contacts;
 	
-	public MeetingImpl(int id, Calendar date, Set<Contact> contacts) {
+	public MeetingImpl(int id, Set<Contact> contacts, Calendar date) {
 		this.id = id;
 		this.date = date;
 		this.contacts = contacts;
 	}
 	public MeetingImpl(Meeting meeting) {
-		this(meeting.getId(), meeting.getDate(), meeting.getContacts());
+		this(meeting.getId(), meeting.getContacts(), meeting.getDate());
 	}
 	public int getId() {
 		return id;
@@ -26,8 +26,8 @@ public class MeetingImpl implements Meeting {
 	public boolean equals(Meeting otherMeeting) {
 		boolean equal = false;
 		equal = getId() == otherMeeting.getId();
-		equal = equal && getDate().equals(otherMeeting.getDate());
 		equal = equal && getContacts().equals(otherMeeting.getContacts());
+		equal = equal && getDate().equals(otherMeeting.getDate());
 		return equal;
 	}
 }

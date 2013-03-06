@@ -21,7 +21,7 @@ public class MeetingTest {
 		contacts.add(contact1);
 		contacts.add(contact2);
 		date = Calendar.getInstance();
-		meeting = new MeetingImpl(1, date, contacts);
+		meeting = new MeetingImpl(1, contacts, date);
 		meetingSame = new MeetingImpl(meeting);
 	}
 	@Test

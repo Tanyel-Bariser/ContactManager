@@ -31,6 +31,6 @@ public class ContactImpl implements Contact {
 		equal = getId() == otherContact.getId();
 		equal = equal && getName().equals(otherContact.getName());
 		equal = equal && getNotes().equals(otherContact.getNotes());
-		return true;
+		return equal;
 	}		
 }

@@ -22,7 +22,6 @@ public class PastMeetingTest {
 		contacts.add(contact2);
 		date = Calendar.getInstance();
 		meeting = new PastMeetingImpl(1, date, contacts, "MeetingNotes");
-		meetingSame = new PastMeetingImpl(meeting);
 	}
 	@Test
 	public void testsGetId() {
@@ -42,6 +41,8 @@ public class PastMeetingTest {
 	}
 	@Test
 	public void testsEquals() {
+		meetingSame = new PastMeetingImpl(meeting);
+		meeting.addNotes("");	//Replicates the additional (+ "\n") of meetingSame's notes
 		assertTrue(meeting.equals(meetingSame));
 	}
 }

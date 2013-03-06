@@ -3,10 +3,10 @@ import java.util.Set;
 
 public class FutureMeetingImpl extends MeetingImpl implements FutureMeeting {
 	
-	public FutureMeetingImpl(int id, Calendar date, Set<Contact> contacts) {
-		super(id, date, contacts);
+	public FutureMeetingImpl(int id, Set<Contact> contacts, Calendar date) {
+		super(id, contacts, date);
 	}
 	public FutureMeetingImpl(Meeting meeting) {
-		super(meeting.getId(), meeting.getDate(), meeting.getContacts());
+		super(meeting.getId(), meeting.getContacts(), meeting.getDate());
 	}
 }

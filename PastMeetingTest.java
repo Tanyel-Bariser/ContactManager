@@ -21,7 +21,7 @@ public class PastMeetingTest {
 		contacts.add(contact1);
 		contacts.add(contact2);
 		date = Calendar.getInstance();
-		meeting = new PastMeetingImpl(1, date, contacts, "MeetingNotes");
+		meeting = new PastMeetingImpl(1, contacts, date, "MeetingNotes");
 	}
 	@Test
 	public void testsGetId() {

@@ -14,15 +14,18 @@ public class ContactManagerImpl implements ContactManager {
 		idMeetingsMap = new HashMap();
 		meetingId = 0;
 	}
-	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-		if (date.compareTo(Calendar.getInstance()) < 0) {
-			throw new IllegalArgumentException("Date of meeting to be added cannot be in the past.");
-		}
+	private void checkContactsAreKnown(Set<Contact> contacts) {
 		for (Contact contact : contacts) {
 			boolean unknownContact = !idContactsMap.containsValue(contact);//True if does NOT contain contact
 			if (unknownContact) {
-				throw new IllegalArgumentException("Set of contacts contains unknown contact(s)");
+				throw new IllegalArgumentException(contact.getName() + "is an unknown contact");
 			}
+		}
+	}
+	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
+		checkContactsAreKnown(contacts);
+		if (date == null || date.compareTo(Calendar.getInstance()) < 0) {
+			throw new IllegalArgumentException("Date of meeting to be added should be future.");
 		}
 		meetingId++;
 		idMeetingsMap.put(meetingId, new FutureMeetingImpl(meetingId, contacts, date));

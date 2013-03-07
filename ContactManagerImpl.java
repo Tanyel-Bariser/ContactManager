@@ -9,12 +9,10 @@ import java.util.Collections;
 public class ContactManagerImpl implements ContactManager {
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
-	private int meetingId;
 	
 	public ContactManagerImpl() {
 		idContactsMap = new HashMap<>();
 		idMeetingsMap = new HashMap<>();
-		meetingId = 0;
 	}
 	private void checkContactsAreKnown(Set<Contact> contacts) {
 		for (Contact contact : contacts) {
@@ -29,15 +27,16 @@ public class ContactManagerImpl implements ContactManager {
 		if (date == null || date.compareTo(Calendar.getInstance()) < 0) {
 			throw new IllegalArgumentException("Date of meeting to be added should be in the future NOT the past.");
 		}
-		meetingId++;
-		idMeetingsMap.put(meetingId, new FutureMeetingImpl(meetingId, contacts, date));
+		Meeting futureMeeting = new FutureMeetingImpl(contacts, date);
+		int meetingId = futureMeeting.getId();
+		idMeetingsMap.put(meetingId, futureMeeting);
 		return meetingId;
 	}
 	public PastMeeting getPastMeeting(int id) {
 		Meeting pastMeeting = idMeetingsMap.get(id);
 		if (pastMeeting == null || pastMeeting.getDate().compareTo(Calendar.getInstance()) < 0) {
 			return (PastMeeting) pastMeeting;//Returns null if id is not mapped to meeting
-		} else {						// or returns pastMeeting if its date is in the past
+		} else {
 			throw new IllegalArgumentException("Date of meeting is in the future.");
 		}
 	}
@@ -45,12 +44,12 @@ public class ContactManagerImpl implements ContactManager {
 		Meeting futureMeeting = idMeetingsMap.get(id);
 		if (futureMeeting == null || futureMeeting.getDate().compareTo(Calendar.getInstance()) > 0) {
 			return (FutureMeeting) futureMeeting;//Returns null if id is not mapped to meeting
-		} else {							// or returns pastMeeting if its date is in the future
+		} else {
 			throw new IllegalArgumentException("Date of meeting is in the past.");
 		}
 	}
 	public Meeting getMeeting(int id) {
-		return idMeetingsMap.get(id);//Returns meeting/value (or null)  mapped to the id/key
+		return idMeetingsMap.get(id);//Returns meeting/value if mapped to id/key(or null if not mapped)
 	}
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 		if (!idContactsMap.containsValue(contact)) {
@@ -62,7 +61,7 @@ public class ContactManagerImpl implements ContactManager {
 				contactFutureMeetings.add(meeting);
 			}
 		}
-		Collections.sort(contactFutureMeetings, new DateMeetingComparator());
+		Collections.sort(contactFutureMeetings, new DateMeetingComparator());//sorts list by date
 		return contactFutureMeetings;
 	}
 	public List<Meeting> getFutureMeetingList(Calendar date) {

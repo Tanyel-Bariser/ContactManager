@@ -1,18 +1,16 @@
 public class ContactImpl implements Contact {
+	private static int idStatic = 0;
 	private int id;
 	private String name;
 	private String notes;
 	
-	public ContactImpl(int id, String name, String notes) {
-		this.id = id;
+	public ContactImpl(String name, String notes) {
+		id = idStatic++;
 		this.name = name;
 		this.notes = notes + "\n";
 	}
-	public ContactImpl(int id, String name) {
-		this(id, name, "");
-	}
-	public ContactImpl(Contact contact) {
-		this(contact.getId(), contact.getName(), contact.getNotes());
+	public ContactImpl(String name) {
+		this(name, "");
 	}
 	public int getId() {
 		return id;
@@ -25,12 +23,5 @@ public class ContactImpl implements Contact {
 	}
 	public void addNotes(String note) {
 		notes += note + "\n";
-	}
-	public boolean equals(Contact otherContact) {
-		boolean equal = false;
-		equal = getId() == otherContact.getId();
-		equal = equal && getName().equals(otherContact.getName());
-		equal = equal && getNotes().equals(otherContact.getNotes());
-		return equal;
 	}		
 }

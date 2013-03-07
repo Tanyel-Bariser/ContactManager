@@ -37,7 +37,12 @@ public class ContactManagerImpl implements ContactManager {
 		}
 	}
 	public FutureMeeting getFutureMeeting(int id) {
-		
+		Meeting futureMeeting = idMeetingsMap.get(id);
+		if (futureMeeting == null || futureMeeting.getDate().compareTo(Calendar.getInstance()) > 0) {
+			return (FutureMeeting) futureMeeting;	//Returns null if id is not mapped to meeting or returns pastMeeting if its date is in the future
+		} else {
+			throw new IllegalArgumentException("Date of meeting is in the future.");
+		}
 	}
 	public Meeting getMeeting(int id) {
 		

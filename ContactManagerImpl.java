@@ -16,20 +16,25 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		if (date.compareTo(Calendar.getInstance()) < 0) {
-			throw new IllegalArgumentException("Date of meeting to be added cannot be in past.");
+			throw new IllegalArgumentException("Date of meeting to be added cannot be in the past.");
 		}
 		for (Contact contact : contacts) {
-			boolean unknownContact = !idContactsMap.containsValue(contact);
+			boolean unknownContact = !idContactsMap.containsValue(contact);	//Assigns true if does NOT contain contact
 			if (unknownContact) {
 				throw new IllegalArgumentException("Set of contacts contains unknown contact(s)");
 			}
 		}
 		meetingId++;
-		idMeetingMap.put(meetingId, new FutureMeetingImpl(meetingId, contacts, date));
+		idMeetingsMap.put(meetingId, new FutureMeetingImpl(meetingId, contacts, date));
 		return meetingId;
 	}
 	public PastMeeting getPastMeeting(int id) {
-		 
+		Meeting pastMeeting = idMeetingsMap.get(id);
+		if (pastMeeting == null || pastMeeting.getDate().compareTo(Calendar.getInstance()) < 0) {
+			return (PastMeeting) pastMeeting;	//Returns null if id is not mapped to meeting or returns pastMeeting if its date is in the past
+		} else {
+			throw new IllegalArgumentException("Date of meeting is in the future.");
+		}
 	}
 	public FutureMeeting getFutureMeeting(int id) {
 		

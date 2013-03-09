@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Calendar;
-
+//A class to test the methods of PastMeetingImpl
 public class PastMeetingTest {
 	private Contact contact1, contact2;
 	private Set<Contact> contacts;
@@ -48,7 +48,7 @@ public class PastMeetingTest {
 		assertEquals(contacts, meeting.getContacts());
 	}
 	@Test
-	public void testsGetNotes() {
+	public void testsGetNotes() {//PastMeetingImpl constructor method automatically adds "\n" to the end of each new note
 		assertEquals(meeting.getNotes(), "MeetingNotes\n");
 	}
 }

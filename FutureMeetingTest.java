@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Calendar;
-
+//A class to test the methods of FutureMeetingImpl
 public class FutureMeetingTest {
 	private Contact contact1, contact2;
 	private Set<Contact> contacts;

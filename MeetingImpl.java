@@ -1,8 +1,8 @@
 import java.util.Calendar;
 import java.util.Set;
-
+//Meetings have unique IDs, scheduled date and a list of participating contacts
 public class MeetingImpl implements Meeting {
-	private static int idStatic = 0;
+	private static int idStatic = 0;//Prevents more than one meeting having the same id
 	private int id;
 	private Calendar date;
 	private Set<Contact> contacts;
@@ -18,6 +18,7 @@ public class MeetingImpl implements Meeting {
 	public Calendar getDate() {
 		return date;
 	}
+	//Return the details of people that attended the meeting.
 	public Set<Contact> getContacts() {
 		return contacts;
 	}

@@ -14,8 +14,15 @@ public class ContactManagerImpl implements ContactManager {
 		idContactsMap = new HashMap<>();
 		idMeetingsMap = new HashMap<>();
 	}
-	//Takes a set of contacts and complains if one or more contact(s) is unknown.
+	
+	//Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
 	private void checkContactsAreKnown(Set<Contact> contacts) {
+		if (contacts == null) {
+			throw new NullPointerException("Set of contacts points to null");
+		}
+		if (contacts.isEmpty()) {
+			throw new IllegalArgumentException("Set of contacts is empty.");
+		}
 		for (Contact contact : contacts) {
 			boolean unknownContact = !idContactsMap.containsValue(contact);
 			if (unknownContact) {
@@ -23,59 +30,93 @@ public class ContactManagerImpl implements ContactManager {
 			}
 		}
 	}
-	//Takes one contact and complains if contact is unknown.
+	
+	//Takes one contact as argument and complains if contact is null/unknown.
 	private void checkContactIsKnown(Contact contact) {
+		if (contact == null) {
+			throw new NullPointerException("Contact points to null");
+		}
 		if (!idContactsMap.containsValue(contact)) {
-			throw new IllegalArgumentException(contact.getName() + "is an unknown contact");
+			throw new IllegalArgumentException(contact.getName() + " is an unknown contact");
 		}
 	}
+	
+	//Following two methods checks date and text arguments for null, respectively.
+	private void checkDateForNull(Calendar date) {
+		if (date == null) {
+			throw new NullPointerException("Date points to null");
+		}
+	}
+	private void checkTextForNull(String text) {
+		if (text == null) {
+			throw new NullPointerException("Text, i.e. name or notes, points to null");
+		}
+	}
+	
+	//Following two methods makes sure dates are in the past or future, respectively.
+	private void complainIfFuture(Calendar date) {
+		checkDateForNull(date);
+		if (date.after(Calendar.getInstance())) {
+			throw new IllegalArgumentException("Date of meeting should be in the past NOT the future.");
+		}
+	}
+	private void complainIfPast(Calendar date) {
+		checkDateForNull(date);
+		if (date.before(Calendar.getInstance())) {
+			throw new IllegalArgumentException("Date of meeting should be in the future NOT the past.");
+		}
+	}
+		
 	//Adds a new meeting to be held in the future. Complains if a contact is unknown or if the date is in the past.
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		checkContactsAreKnown(contacts);
-		if (date == null || date.compareTo(Calendar.getInstance()) < 0) {
-			throw new IllegalArgumentException("Date of meeting to be added should be in the future NOT the past.");
-		}
+		complainIfPast(date);
 		Meeting futureMeeting = new FutureMeetingImpl(contacts, date);
 		int meetingId = futureMeeting.getId();
 		idMeetingsMap.put(meetingId, futureMeeting);
 		return meetingId;
 	}
+	
 	//Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
 	public PastMeeting getPastMeeting(int id) {
 		Meeting pastMeeting = idMeetingsMap.get(id);
-		if (pastMeeting == null || pastMeeting.getDate().compareTo(Calendar.getInstance()) < 0) {
-			return (PastMeeting) pastMeeting;
-		} else {
-			throw new IllegalArgumentException("Date of meeting is in the future.");
+		complainIfFuture(pastMeeting.getDate());
+		if (pastMeeting == null) {
+			return null;
+		} else if (!(pastMeeting instanceof PastMeeting)) {
+//FIX HERE
 		}
+		return (PastMeeting) pastMeeting;
 	}
+	
 	//Returns the FUTURE meeting with the requested ID, or null. Complains if the meeting is in the past.
 	public FutureMeeting getFutureMeeting(int id) {
 		Meeting futureMeeting = idMeetingsMap.get(id);
-		if (futureMeeting == null || futureMeeting.getDate().compareTo(Calendar.getInstance()) > 0) {
-			return (FutureMeeting) futureMeeting;
-		} else {
-			throw new IllegalArgumentException("Date of meeting is in the past.");
-		}
+		complainIfPast(futureMeeting.getDate());
+		return (FutureMeeting) futureMeeting;
 	}
+	
 	//Returns the meeting with the requested ID, or null if it there is none.
 	public Meeting getMeeting(int id) {
 		return idMeetingsMap.get(id);
 	}
+	
 	//Returns the list of sorted future meetings scheduled with this contact. Complains if contact is unknown.
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 		checkContactIsKnown(contact);
 		List<Meeting> contactFutureMeetings = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getContacts().contains(contact) && meeting.getDate().compareTo(Calendar.getInstance()) > 0) {
+			if (meeting.getContacts().contains(contact) && meeting.getDate().after(Calendar.getInstance())) {
 				contactFutureMeetings.add(meeting);
 			}
 		}
 		Collections.sort(contactFutureMeetings, new DateMeetingComparator());
 		return contactFutureMeetings;
 	}
+	
 	//Returns the list of sorted meetings that are scheduled for, OR THAT TOOK PLACE ON, the specified date.
 	public List<Meeting> getFutureMeetingList(Calendar date) {
+		checkDateForNull(date);
 		List<Meeting> futureMeetingsList = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
 			if (meeting.getDate().equals(date)) {
@@ -85,42 +126,52 @@ public class ContactManagerImpl implements ContactManager {
 		Collections.sort(futureMeetingsList, new DateMeetingComparator());
 		return futureMeetingsList;
 	}
+	
 	//Returns the list of past meetings in which this contact has participated. Complains if contact is unknown.
 	public List<PastMeeting> getPastMeetingList(Contact contact) {
 		checkContactIsKnown(contact);
 		List<PastMeeting> contactPastMeetings = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getContacts().contains(contact) && meeting.getDate().compareTo(Calendar.getInstance()) < 0) {
-				if (!meeting instanceof PastMeeting) {
-//FOUND MISTAKE... NEED TO MAKE SURE ONLY INSTANCES OF PASTMEETING ARE ADDED TO LIST
-				contactPastMeetings.add(meeting);
+			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
+				if (!(meeting instanceof PastMeeting)) {
+//FIX HERE
+				}
+				contactPastMeeting.add(pastMeeting);
 			}
 		}
 		Collections.sort(contactPastMeetings, new DateMeetingComparator());
 		return contactPastMeetings;
 	}
+	
+	//Create a new record for a meeting that took place in the past.
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
 		checkContactsAreKnown(contacts);
-		if (date == null || date.compareTo(Calendar.getInstance()) > 0) {
-			throw new IllegalArgumentException("Date of meeting to be added should be in the past NOT the future.");
-		}
+		complainIfFuture(date);
+		checkTextForNull(text);
 		Meeting pastMeeting = new PastMeetingImpl(contacts, date, text);
 		int meetingId = pastMeeting.getId();
 		idMeetingsMap.put(meetingId, pastMeeting);
-		return meetingId;
 	}
+	
 	public void addMeetingNotes(int id, String text) {
+		checkTextForNull(text);
 		
 	}
+	
 	public void addNewContact(String name, String notes) {
-		
+		checkTextForNull(name);
+		checkTextForNull(notes);
+
 	}
+	
 	public Set<Contact> getContacts(int... ids) {
 		
 	}
+	
 	public Set<Contact> getContacts(String name) {
-		
+		checkTextForNull(name);
 	}
+	
 	public void flush() {
 	
 	}

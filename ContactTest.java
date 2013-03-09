@@ -4,7 +4,7 @@ import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-
+//A class to test the methods of ContactImpl
 public class ContactTest {
 	private Contact contact, contactNext;
 

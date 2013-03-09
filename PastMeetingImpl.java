@@ -1,6 +1,6 @@
 import java.util.Calendar;
 import java.util.Set;
-
+//A class for past meetings including notes about what happened and what was agreed
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 	private String notes = "";
 	

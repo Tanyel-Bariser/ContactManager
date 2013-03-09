@@ -42,12 +42,12 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	
 	//Following two methods checks date and text arguments for null, respectively.
-	private void checkDateForNull(Calendar date) {
+	private void checkForNull(Calendar date) {
 		if (date == null) {
 			throw new NullPointerException("Date points to null");
 		}
 	}
-	private void checkTextForNull(String text) {
+	private void checkForNull(String text) {
 		if (text == null) {
 			throw new NullPointerException("Text, i.e. name or notes, points to null");
 		}
@@ -55,13 +55,13 @@ public class ContactManagerImpl implements ContactManager {
 	
 	//Following two methods makes sure dates are in the past or future, respectively.
 	private void complainIfFuture(Calendar date) {
-		checkDateForNull(date);
+		checkForNull(date);
 		if (date.after(Calendar.getInstance())) {
 			throw new IllegalArgumentException("Date of meeting should be in the past NOT the future.");
 		}
 	}
 	private void complainIfPast(Calendar date) {
-		checkDateForNull(date);
+		checkForNull(date);
 		if (date.before(Calendar.getInstance())) {
 			throw new IllegalArgumentException("Date of meeting should be in the future NOT the past.");
 		}
@@ -116,7 +116,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 	//Returns the list of sorted meetings that are scheduled for, OR THAT TOOK PLACE ON, the specified date.
 	public List<Meeting> getFutureMeetingList(Calendar date) {
-		checkDateForNull(date);
+		checkForNull(date);
 		List<Meeting> futureMeetingsList = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
 			if (meeting.getDate().equals(date)) {
@@ -147,20 +147,20 @@ public class ContactManagerImpl implements ContactManager {
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
 		checkContactsAreKnown(contacts);
 		complainIfFuture(date);
-		checkTextForNull(text);
+		checkForNull(text);
 		Meeting pastMeeting = new PastMeetingImpl(contacts, date, text);
 		int meetingId = pastMeeting.getId();
 		idMeetingsMap.put(meetingId, pastMeeting);
 	}
 	
 	public void addMeetingNotes(int id, String text) {
-		checkTextForNull(text);
+		checkForNull(text);
 		
 	}
 	
 	public void addNewContact(String name, String notes) {
-		checkTextForNull(name);
-		checkTextForNull(notes);
+		checkForNull(name);
+		checkForNull(notes);
 
 	}
 	
@@ -169,7 +169,7 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	
 	public Set<Contact> getContacts(String name) {
-		checkTextForNull(name);
+		checkForNull(name);
 	}
 	
 	public void flush() {

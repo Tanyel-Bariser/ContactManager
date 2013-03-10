@@ -84,7 +84,7 @@ public class ContactManagerImpl implements ContactManager {
 		} else if (!(pastMeeting instanceof PastMeeting)) {
 			addMeetingNotes(id, "");
 		}
-		return getMeeting(id);
+		return (PastMeeting) getMeeting(id);
 	}
 
 	//Returns the FUTURE meeting with the requested ID, or null. Complains if the meeting is in the past.
@@ -132,11 +132,11 @@ public class ContactManagerImpl implements ContactManager {
 		for (Meeting meeting : idMeetingsMap.values()) {
 			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
 				if (!(meeting instanceof PastMeeting)) {
-					int id = meeeting.getId();
+					int id = meeting.getId();
 					addMeetingNotes(id, "");
 					meeting = getMeeting(id);
 				}
-				contactPastMeeting.add(meeting);
+				contactPastMeetings.add((PastMeeting) meeting);
 			}
 		}
 		Collections.sort(contactPastMeetings, new DateMeetingComparator());
@@ -154,20 +154,20 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	//Adds notes to a past meeting or after a future meeting has taken place and is be converted to a past meeting.
 	public void addMeetingNotes(int id, String text) {
-		String notes;
 		Meeting meeting = getMeeting(id);
 		checkForNull(text);
 		if (meeting == null) {
 			throw new IllegalArgumentException("Meeting does not exist.");
 		} else if (meeting.getDate().after(Calendar.getInstance())) {
 			throw new IllegalStateException("Meeting is set for a date in the future.");
-		} else if (meeting instanceof PastMeeting) {
-			meeting.addNotes(text);
+		} else if (meeting instanceof PastMeetingImpl) {
+			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;
+			sameMeeting.addNotes(text);
 		} else {
 			idMeetingsMap.remove(meeting);
 			PastMeeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
-			idMeetingsMap.put(id, pastMeeting);
-		}	
+			idMeetingsMap.put(id, pastMeeting);	
+		}
 	}
 
 	public void addNewContact(String name, String notes) {

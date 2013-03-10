@@ -162,11 +162,9 @@ public class ContactManagerImpl implements ContactManager {
 		} else if (meeting instanceof PastMeeting) {
 			meeting.addNotes(text);
 		} else {
-			PastMeeting pastMeeting = new PastMeetingImpl(meeting.getContacts(), meeting.getDate(), text);
+			PastMeeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
 			idMeetingsMap.remove(meeting);
-			System.out.println("The meeting with the id number " + id + " has been converted from future meeting "
-					+ "status to past meeting status and therefore now has a new id number: " + pastMeeting.getId());
-			idMeetingsMap.put(pastMeeting.getId(), pastMeeting);
+			idMeetingsMap.put(id, pastMeeting);
 		}	
 	}
 

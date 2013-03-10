@@ -8,6 +8,10 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 		super(contacts, date);
 		notes += note + "\n";
 	}
+	public PastMeetingImpl(int id, Set<Contact> contacts, Calendar date, String note) {
+		super(id, contacts, date);
+		notes += note + "\n";
+	}
 	public String getNotes() {
 		return notes;
 	}

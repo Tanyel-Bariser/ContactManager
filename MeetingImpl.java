@@ -1,7 +1,7 @@
 import java.util.Calendar;
 import java.util.Set;
 //Meetings have unique IDs, scheduled date and a list of participating contacts
-public class MeetingImpl implements Meeting {
+public abstract class MeetingImpl implements Meeting {
 	private static int idStatic = 0;//Prevents more than one meeting having the same id
 	private int id;
 	private Calendar date;

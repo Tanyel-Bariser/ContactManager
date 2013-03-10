@@ -12,6 +12,11 @@ public abstract class MeetingImpl implements Meeting {
 		this.date = date;
 		this.contacts = contacts;
 	}
+	public MeetingImpl(int id, Set<Contact> contacts, Calendar date) {//Only used for past meetings
+		this.id = id;//Only used when converting future meetings to past meetings to keep the original id
+		this.date = date;
+		this.contacts = contacts;
+	}
 	public int getId() {
 		return id;
 	}

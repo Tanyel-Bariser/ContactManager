@@ -24,9 +24,10 @@ public class ContactManagerImpl implements ContactManager {
 	
 	@SuppressWarnings("unchecked")//Suppresses due to unchecked casts.
 	public ContactManagerImpl() {//Don't know what input.readObject() will be an instance of.
+		ObjectInputStream input = null;
 		try {
 			if (new File(FILE).exists()) {
-				ObjectInputStream input = new ObjectInputStream(
+				input = new ObjectInputStream(
 						new BufferedInputStream(new FileInputStream(FILE)));
 				idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST	
 				idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHECKED CAST
@@ -37,6 +38,14 @@ public class ContactManagerImpl implements ContactManager {
 		} catch (IOException | ClassNotFoundException ex) {
 			ex.printStackTrace();
 			System.err.println("Error on read; " + ex);
+		} finally {
+			try {
+				if (input != null) {
+					input.close();
+				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	
@@ -102,9 +111,9 @@ public class ContactManagerImpl implements ContactManager {
 		Meeting meeting = getMeeting(id);
 		checkForNull(text);
 		if (meeting == null) {
-			throw new IllegalArgumentException("Meeting does not exist.");
+			throw new IllegalArgumentException("Meeting with ID " + id + " does not exist.");
 		} else if (meeting.getDate().after(Calendar.getInstance())) {
-			throw new IllegalStateException("Meeting is set for a date in the future.");
+			throw new IllegalStateException("Meeting with ID " + id + " is set for a date in the future.");
 		} else if (meeting instanceof PastMeetingImpl) {
 			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;//Downcast because PastMeetingImpl has addNotes()
 			sameMeeting.addNotes(text);

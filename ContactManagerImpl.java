@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -14,19 +15,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 //A class to manage your contacts and meetings
 public class ContactManagerImpl implements ContactManager {
 	private static final String FILE = "contacts.txt";
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
 	
-	@SuppressWarnings("unchecked")//suppresses unchecked cast on lines 28 & 29, not sure how to fix this
+	@SuppressWarnings("unchecked")//Suppresses due unchecked casts. Don't know what input.readObject() will be an instance of!!!
 	public ContactManagerImpl() {
 		try {
 			if (new File(FILE).exists()) {
 				ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(new FileInputStream(FILE)));
-                idContactsMap = (Map<Integer, Contact>) input.readObject();
-                idMeetingsMap = (Map<Integer, Meeting>) input.readObject();
+                idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST
+                idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHEKCED CAST
 			} else {
             idContactsMap = new HashMap<>();
 			idMeetingsMap = new HashMap<>();
@@ -36,7 +38,10 @@ public class ContactManagerImpl implements ContactManager {
 				System.err.println("Error on read: " + ex);
 		}
 	}
-
+	
+					/**************************************
+					*    SUPPLEMENTARY PRIVATE METHODS    *
+					**************************************/
 	//Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
 	private void checkContactsAreKnown(Set<Contact> contacts) {
 		if (contacts == null) {
@@ -51,7 +56,6 @@ public class ContactManagerImpl implements ContactManager {
 			}
 		}
 	}
-
 	//Takes one contact as argument and complains if contact is null/unknown.
 	private void checkContactIsKnown(Contact contact) {
 		if (contact == null) {
@@ -60,7 +64,6 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException(contact.getName() + " is an unknown contact");
 		}
 	}
-
 	//Following two methods checks date and text arguments for null, respectively.
 	private void checkForNull(Calendar date) {
 		if (date == null) {
@@ -72,7 +75,6 @@ public class ContactManagerImpl implements ContactManager {
 			throw new NullPointerException("Text, i.e. name or notes, points to null");
 		}
 	}
-
 	//Following two methods makes sure dates are in the past or future, respectively.
 	private void complainIfFuture(Calendar date) {
 		checkForNull(date);
@@ -86,95 +88,14 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("Date of meeting should be in the future.");
 		}
 	}
-
-	//Adds a new meeting to be held in the future. Complains if a contact is unknown or if the date is in the past.
-	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-		checkContactsAreKnown(contacts);
-		complainIfPast(date);
-		Meeting futureMeeting = new FutureMeetingImpl(contacts, date);
-		int id = futureMeeting.getId();
-		idMeetingsMap.put(id, futureMeeting);
-		return id;
-	}
-
-	//Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
-	public PastMeeting getPastMeeting(int id) {
-		Meeting pastMeeting = getMeeting(id);
-		complainIfFuture(pastMeeting.getDate());
-		if (pastMeeting == null) {
-			return null;
-		} else if (!(pastMeeting instanceof PastMeeting)) {
-			addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
-		}
-		return (PastMeeting) getMeeting(id);
-	}
-
-	//Returns the FUTURE meeting with the requested ID, or null. Complains if the meeting is in the past.
-	public FutureMeeting getFutureMeeting(int id) {
-		Meeting futureMeeting = getMeeting(id);
-		complainIfPast(futureMeeting.getDate());
-		return (FutureMeeting) futureMeeting;
-	}
-
+	
+					/***********************
+					*    MEETING METHODS   *
+					***********************/
 	//Returns the meeting with the requested ID, or null if it there is none.
 	public Meeting getMeeting(int id) {
 		return idMeetingsMap.get(id);
 	}
-
-	//Returns the list of sorted future meetings scheduled with this contact. Complains if contact is unknown.
-	public List<Meeting> getFutureMeetingList(Contact contact) {
-		checkContactIsKnown(contact);
-		List<Meeting> contactFutureMeetings = new LinkedList<>();
-		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getContacts().contains(contact) && meeting.getDate().after(Calendar.getInstance())) {
-				contactFutureMeetings.add(meeting);
-			}
-		}
-		Collections.sort(contactFutureMeetings, new DateMeetingComparator());
-		return contactFutureMeetings;
-	}
-
-	//Returns the list of sorted meetings that are scheduled for, OR THAT TOOK PLACE ON, the specified date.
-	public List<Meeting> getFutureMeetingList(Calendar date) {
-		checkForNull(date);
-		List<Meeting> meetingsList = new LinkedList<>();
-		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getDate().equals(date)) {
-				meetingsList.add(meeting);
-			}
-		}
-		Collections.sort(meetingsList, new DateMeetingComparator());
-		return meetingsList;
-	}
-
-	//Returns the list of past meetings in which this contact has participated. Complains if contact is unknown.
-	public List<PastMeeting> getPastMeetingList(Contact contact) {
-		checkContactIsKnown(contact);
-		List<PastMeeting> contactPastMeetings = new LinkedList<>();
-		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
-				if (!(meeting instanceof PastMeeting)) {
-					int id = meeting.getId();
-					addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
-					meeting = getMeeting(id);
-				}
-				contactPastMeetings.add((PastMeeting) meeting);
-			}
-		}
-		Collections.sort(contactPastMeetings, new DateMeetingComparator());
-		return contactPastMeetings;
-	}
-
-	//Create a new record for a meeting that took place in the past.
-	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
-		checkContactsAreKnown(contacts);
-		complainIfFuture(date);
-		checkForNull(text);
-		Meeting pastMeeting = new PastMeetingImpl(contacts, date, text);
-		int id = pastMeeting.getId();
-		idMeetingsMap.put(id, pastMeeting);
-	}
-	
 	//Adds notes to a past meeting or after a future meeting has taken place this method also converts it to a past meeting.
 	public void addMeetingNotes(int id, String text) {
 		Meeting meeting = getMeeting(id);
@@ -192,7 +113,95 @@ public class ContactManagerImpl implements ContactManager {
 			idMeetingsMap.put(id, pastMeeting);	
 		}
 	}
+	//Returns the list of sorted meetings that are scheduled for, OR THAT TOOK PLACE ON, the specified date.
+	public List<Meeting> getFutureMeetingList(Calendar date) {//Better name would have been getMeetingList()
+		checkForNull(date);
+		List<Meeting> meetingsList = new LinkedList<>();
+		for (Meeting meeting : idMeetingsMap.values()) {
+			if (meeting.getDate().equals(date)) {
+				meetingsList.add(meeting);
+			}
+		}
+		Collections.sort(meetingsList, new DateMeetingComparator());
+		return meetingsList;
+	}
 	
+					/****************************
+					*    PASTMEETING METHODS    *
+					****************************/
+	//Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
+	public PastMeeting getPastMeeting(int id) {
+		Meeting pastMeeting = getMeeting(id);
+		complainIfFuture(pastMeeting.getDate());
+		if (pastMeeting == null) {
+			return null;
+		} else if (!(pastMeeting instanceof PastMeeting)) {
+			addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
+		}
+		return (PastMeeting) getMeeting(id);
+	}
+	//Returns the list of past meetings in which this contact has participated. Complains if contact is unknown.
+	public List<PastMeeting> getPastMeetingList(Contact contact) {
+		checkContactIsKnown(contact);
+		List<PastMeeting> contactPastMeetings = new LinkedList<>();
+		for (Meeting meeting : idMeetingsMap.values()) {
+			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
+				if (!(meeting instanceof PastMeeting)) {
+					int id = meeting.getId();
+					addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
+					meeting = getMeeting(id);
+				}
+				contactPastMeetings.add((PastMeeting) meeting);
+			}
+		}
+		Collections.sort(contactPastMeetings, new DateMeetingComparator());
+		return contactPastMeetings;
+	}
+	//Create a new record for a meeting that took place in the past.
+	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
+		checkContactsAreKnown(contacts);
+		complainIfFuture(date);
+		checkForNull(text);
+		Meeting pastMeeting = new PastMeetingImpl(contacts, date, text);
+		int id = pastMeeting.getId();
+		idMeetingsMap.put(id, pastMeeting);
+	}
+	
+					/******************************
+					*    FUTUREMEETING METHODS    *
+					******************************/
+	//Adds a new meeting to be held in the future. Complains if a contact is unknown or if the date is in the past.
+	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
+		checkContactsAreKnown(contacts);
+		complainIfPast(date);
+		Meeting futureMeeting = new FutureMeetingImpl(contacts, date);
+		int id = futureMeeting.getId();
+		idMeetingsMap.put(id, futureMeeting);
+		return id;
+	}
+	//Returns the FUTURE meeting with the requested ID, or null. Complains if the meeting is in the past.
+	public FutureMeeting getFutureMeeting(int id) {
+		Meeting futureMeeting = getMeeting(id);
+		complainIfPast(futureMeeting.getDate());
+		return (FutureMeeting) futureMeeting;
+	}
+	
+	//Returns the list of sorted future meetings scheduled with this contact. Complains if contact is unknown.
+	public List<Meeting> getFutureMeetingList(Contact contact) {
+		checkContactIsKnown(contact);
+		List<Meeting> contactFutureMeetings = new LinkedList<>();
+		for (Meeting meeting : idMeetingsMap.values()) {
+			if (meeting.getContacts().contains(contact) && meeting.getDate().after(Calendar.getInstance())) {
+				contactFutureMeetings.add(meeting);
+			}
+		}
+		Collections.sort(contactFutureMeetings, new DateMeetingComparator());
+		return contactFutureMeetings;
+	}
+	
+					/************************
+					*    CONTACT METHODS    *
+					************************/
 	//Create a new contact with the specified name and notes.
 	public void addNewContact(String name, String notes) {
 		checkForNull(name);
@@ -201,7 +210,6 @@ public class ContactManagerImpl implements ContactManager {
 		int id = newContact.getId();
 		idContactsMap.put(id, newContact);
 	}
-	
 	//Returns a list containing the contacts that correspond to the IDs.
 	public Set<Contact> getContacts(int... ids) {
 		Set<Contact> contacts = new HashSet<>();
@@ -211,7 +219,6 @@ public class ContactManagerImpl implements ContactManager {
 		}
 		return contacts;
 	}
-	
 	//Returns a list with the contacts whose name contains that string.
 	public Set<Contact> getContacts(String name) {
 		checkForNull(name);
@@ -223,7 +230,10 @@ public class ContactManagerImpl implements ContactManager {
 		}
 		return contacts;
 	}
-	//Save all data to disk.
+	
+					/******************************
+					*    SAVE ALL DATA TO DISK    *
+					******************************/
 	public void flush() {
 		ObjectOutputStream output = null;
 		try {

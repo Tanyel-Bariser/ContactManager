@@ -26,16 +26,17 @@ public class ContactManagerImpl implements ContactManager {
 	public ContactManagerImpl() {//Don't know what input.readObject() will be an instance of.
 		try {
 			if (new File(FILE).exists()) {
-				ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(new FileInputStream(FILE)));
-				idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST
-				idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHEKCED CAST
+				ObjectInputStream input = new ObjectInputStream(
+						new BufferedInputStream(new FileInputStream(FILE)));
+				idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST	
+				idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHECKED CAST
 			} else {
-            idContactsMap = new HashMap<>();
-			idMeetingsMap = new HashMap<>();
+				idContactsMap = new HashMap<>();
+				idMeetingsMap = new HashMap<>();
 			}
 		} catch (IOException | ClassNotFoundException ex) {
-                ex.printStackTrace();
-				System.err.println("Error on read: " + ex);
+			ex.printStackTrace();
+			System.err.println("Error on read; " + ex);
 		}
 	}
 	
@@ -237,7 +238,8 @@ public class ContactManagerImpl implements ContactManager {
 	public void flush() {
 		ObjectOutputStream output = null;
 		try {
-			output = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FILE)));
+			output = new ObjectOutputStream(
+					new BufferedOutputStream(new FileOutputStream(FILE)));
             output.writeObject(idContactsMap);
             output.writeObject(idMeetingsMap);
         } catch (IOException ex) {

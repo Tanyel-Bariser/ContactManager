@@ -22,7 +22,7 @@ public class ContactManagerImpl implements ContactManager {
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
 	
-	@SuppressWarnings("unchecked")//Suppresses due unchecked casts.
+	@SuppressWarnings("unchecked")//Suppresses due to unchecked casts.
 	public ContactManagerImpl() {//Don't know what input.readObject() will be an instance of.
 		try {
 			if (new File(FILE).exists()) {
@@ -213,9 +213,15 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	//Returns a list containing the contacts that correspond to the IDs.
 	public Set<Contact> getContacts(int... ids) {
+		if (ids == null) {
+			throw new NullPointerException("Contacs ids is null.");
+		} else if (ids.length == 0) {
+			throw new IllegalArgumentException("Contacts ids is empty.");
+		}
 		Set<Contact> contacts = new HashSet<>();
 		for (int i = 0; i < ids.length; i++) {
 			Contact contact = idContactsMap.get(ids[i]);
+			checkContactIsKnown(contact);
 			contacts.add(contact);
 		}
 		return contacts;

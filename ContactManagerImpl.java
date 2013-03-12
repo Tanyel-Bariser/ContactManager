@@ -22,13 +22,13 @@ public class ContactManagerImpl implements ContactManager {
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
 	
-	@SuppressWarnings("unchecked")//Suppresses due unchecked casts. Don't know what input.readObject() will be an instance of!!!
-	public ContactManagerImpl() {
+	@SuppressWarnings("unchecked")//Suppresses due unchecked casts.
+	public ContactManagerImpl() {//Don't know what input.readObject() will be an instance of.
 		try {
 			if (new File(FILE).exists()) {
 				ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(new FileInputStream(FILE)));
-                idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST
-                idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHEKCED CAST
+				idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST
+				idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHEKCED CAST
 			} else {
             idContactsMap = new HashMap<>();
 			idMeetingsMap = new HashMap<>();
@@ -96,7 +96,7 @@ public class ContactManagerImpl implements ContactManager {
 	public Meeting getMeeting(int id) {
 		return idMeetingsMap.get(id);
 	}
-	//Adds notes to a past meeting or after a future meeting has taken place this method also converts it to a past meeting.
+	//Adds notes to a past meeting or converts future meeting to a past meeting then adds notes
 	public void addMeetingNotes(int id, String text) {
 		Meeting meeting = getMeeting(id);
 		checkForNull(text);
@@ -105,10 +105,10 @@ public class ContactManagerImpl implements ContactManager {
 		} else if (meeting.getDate().after(Calendar.getInstance())) {
 			throw new IllegalStateException("Meeting is set for a date in the future.");
 		} else if (meeting instanceof PastMeetingImpl) {
-			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;//Downcast because only PastMeetingImpl has the method addNotes()
+			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;//Downcast because PastMeetingImpl has addNotes()
 			sameMeeting.addNotes(text);
-		} else {
-			idMeetingsMap.remove(meeting);//Here the meeting would be an instanceof FutureMeeting and needs to be replaced by an instance of PastMeeting
+		} else {//Instanceof FutureMeeting and needs to be replaced by an instance of PastMeeting
+			idMeetingsMap.remove(meeting);
 			Meeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
 			idMeetingsMap.put(id, pastMeeting);	
 		}
@@ -136,7 +136,7 @@ public class ContactManagerImpl implements ContactManager {
 		if (pastMeeting == null) {
 			return null;
 		} else if (!(pastMeeting instanceof PastMeeting)) {
-			addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
+			addMeetingNotes(id, "");//Converts this meeting from FutureMeeting type to PastMeeting type
 		}
 		return (PastMeeting) getMeeting(id);
 	}
@@ -148,7 +148,7 @@ public class ContactManagerImpl implements ContactManager {
 			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
 				if (!(meeting instanceof PastMeeting)) {
 					int id = meeting.getId();
-					addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
+					addMeetingNotes(id, "");//Converts this meeting from FutureMeeting type to PastMeeting type
 					meeting = getMeeting(id);
 				}
 				contactPastMeetings.add((PastMeeting) meeting);

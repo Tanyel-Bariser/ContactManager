@@ -2,17 +2,39 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 //A class to manage your contacts and meetings
 public class ContactManagerImpl implements ContactManager {
+	private static final String FILE = "contacts.txt";
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
-
+	
+	@SuppressWarnings("unchecked")//suppresses unchecked cast on lines 28 & 29, not sure how to fix this
 	public ContactManagerImpl() {
-		idContactsMap = new HashMap<>();
-		idMeetingsMap = new HashMap<>();
+		try {
+			if (new File(FILE).exists()) {
+				ObjectInputStream input = new ObjectInputStream(new BufferedInputStream(new FileInputStream(FILE)));
+                idContactsMap = (Map<Integer, Contact>) input.readObject();
+                idMeetingsMap = (Map<Integer, Meeting>) input.readObject();
+			} else {
+            idContactsMap = new HashMap<>();
+			idMeetingsMap = new HashMap<>();
+			}
+		} catch (IOException | ClassNotFoundException ex) {
+                ex.printStackTrace();
+				System.err.println("Error on read: " + ex);
+		}
 	}
 
 	//Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
@@ -70,9 +92,9 @@ public class ContactManagerImpl implements ContactManager {
 		checkContactsAreKnown(contacts);
 		complainIfPast(date);
 		Meeting futureMeeting = new FutureMeetingImpl(contacts, date);
-		int meetingId = futureMeeting.getId();
-		idMeetingsMap.put(meetingId, futureMeeting);
-		return meetingId;
+		int id = futureMeeting.getId();
+		idMeetingsMap.put(id, futureMeeting);
+		return id;
 	}
 
 	//Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
@@ -82,7 +104,7 @@ public class ContactManagerImpl implements ContactManager {
 		if (pastMeeting == null) {
 			return null;
 		} else if (!(pastMeeting instanceof PastMeeting)) {
-			addMeetingNotes(id, "");
+			addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
 		}
 		return (PastMeeting) getMeeting(id);
 	}
@@ -133,7 +155,7 @@ public class ContactManagerImpl implements ContactManager {
 			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
 				if (!(meeting instanceof PastMeeting)) {
 					int id = meeting.getId();
-					addMeetingNotes(id, "");
+					addMeetingNotes(id, "");//This is only to convert this meeting from FutureMeeting type to PastMeeting type
 					meeting = getMeeting(id);
 				}
 				contactPastMeetings.add((PastMeeting) meeting);
@@ -149,10 +171,11 @@ public class ContactManagerImpl implements ContactManager {
 		complainIfFuture(date);
 		checkForNull(text);
 		Meeting pastMeeting = new PastMeetingImpl(contacts, date, text);
-		int meetingId = pastMeeting.getId();
-		idMeetingsMap.put(meetingId, pastMeeting);
+		int id = pastMeeting.getId();
+		idMeetingsMap.put(id, pastMeeting);
 	}
-	//Adds notes to a past meeting or after a future meeting has taken place and is be converted to a past meeting.
+	
+	//Adds notes to a past meeting or after a future meeting has taken place this method also converts it to a past meeting.
 	public void addMeetingNotes(int id, String text) {
 		Meeting meeting = getMeeting(id);
 		checkForNull(text);
@@ -161,31 +184,62 @@ public class ContactManagerImpl implements ContactManager {
 		} else if (meeting.getDate().after(Calendar.getInstance())) {
 			throw new IllegalStateException("Meeting is set for a date in the future.");
 		} else if (meeting instanceof PastMeetingImpl) {
-			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;
+			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;//Downcast because only PastMeetingImpl has the method addNotes()
 			sameMeeting.addNotes(text);
 		} else {
-			idMeetingsMap.remove(meeting);
-			PastMeeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
+			idMeetingsMap.remove(meeting);//Here the meeting would be an instanceof FutureMeeting and needs to be replaced by an instance of PastMeeting
+			Meeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
 			idMeetingsMap.put(id, pastMeeting);	
 		}
 	}
-
+	
+	//Create a new contact with the specified name and notes.
 	public void addNewContact(String name, String notes) {
 		checkForNull(name);
 		checkForNull(notes);
-		
+		Contact newContact = new ContactImpl(name, notes);
+		int id = newContact.getId();
+		idContactsMap.put(id, newContact);
 	}
-
+	
+	//Returns a list containing the contacts that correspond to the IDs.
 	public Set<Contact> getContacts(int... ids) {
-		
+		Set<Contact> contacts = new HashSet<>();
+		for (int i = 0; i < ids.length; i++) {
+			Contact contact = idContactsMap.get(ids[i]);
+			contacts.add(contact);
+		}
+		return contacts;
 	}
-
+	
+	//Returns a list with the contacts whose name contains that string.
 	public Set<Contact> getContacts(String name) {
 		checkForNull(name);
-		
+		Set<Contact> contacts = new HashSet<>();
+		for (Contact contact : idContactsMap.values()) {
+			if (contact.getName().toLowerCase().trim().equals(name.toLowerCase().trim())) {
+				contacts.add(contact);
+			}
+		}
+		return contacts;
 	}
-
+	//Save all data to disk.
 	public void flush() {
-		
+		ObjectOutputStream output = null;
+		try {
+			output = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(FILE)));
+            output.writeObject(idContactsMap);
+            output.writeObject(idMeetingsMap);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+			System.err.println("Error on write: " + ex);
+        } finally {
+			try {
+				output.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				System.err.println("Error on close: " + ex);
+			}
+		}
 	}
 }

@@ -45,6 +45,7 @@ public class ContactManagerImpl implements ContactManager {
 				}
 			} catch (IOException ex) {
 				ex.printStackTrace();
+				System.err.println("Error on read close: " + ex);
 			}
 		}
 	}
@@ -265,10 +266,12 @@ public class ContactManagerImpl implements ContactManager {
 			System.err.println("Error on write: " + ex);
 		} finally {
 			try {
-				output.close();
+				if (output != null) {
+					output.close();
+				}
 			} catch (IOException ex) {
 				ex.printStackTrace();
-				System.err.println("Error on close: " + ex);
+				System.err.println("Error on write close: " + ex);
 			}
 		}
 	}

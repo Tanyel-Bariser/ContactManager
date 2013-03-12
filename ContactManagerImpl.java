@@ -240,12 +240,12 @@ public class ContactManagerImpl implements ContactManager {
 		try {
 			output = new ObjectOutputStream(
 					new BufferedOutputStream(new FileOutputStream(FILE)));
-            output.writeObject(idContactsMap);
-            output.writeObject(idMeetingsMap);
-        } catch (IOException ex) {
-            ex.printStackTrace();
+			output.writeObject(idContactsMap);
+			output.writeObject(idMeetingsMap);
+		} catch (IOException ex) {
+			ex.printStackTrace();
 			System.err.println("Error on write: " + ex);
-        } finally {
+		} finally {
 			try {
 				output.close();
 			} catch (IOException ex) {

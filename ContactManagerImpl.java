@@ -214,15 +214,18 @@ public class ContactManagerImpl implements ContactManager {
 	//Returns a list containing the contacts that correspond to the IDs.
 	public Set<Contact> getContacts(int... ids) {
 		if (ids == null) {
-			throw new NullPointerException("Contacs ids is null.");
+			throw new NullPointerException("Contact IDs points to null.");
 		} else if (ids.length == 0) {
-			throw new IllegalArgumentException("Contacts ids is empty.");
+			throw new IllegalArgumentException("Contact IDs is empty.");
 		}
 		Set<Contact> contacts = new HashSet<>();
 		for (int i = 0; i < ids.length; i++) {
-			Contact contact = idContactsMap.get(ids[i]);
-			checkContactIsKnown(contact);
-			contacts.add(contact);
+			if (!idContactsMap.containsKey(ids[i])) {
+				throw new IllegalArgumentException("ID: " + ids[i] + " is unknown.");
+			} else {
+				Contact contact = idContactsMap.get(ids[i]);
+				contacts.add(contact);
+			}
 		}
 		return contacts;
 	}

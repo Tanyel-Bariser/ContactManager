@@ -9,8 +9,8 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 		notes += note + "\n";
 	}
 	public PastMeetingImpl(int id, Set<Contact> contacts, Calendar date, String note) {
-		super(id, contacts, date);
-		notes += note + "\n";
+		super(id, contacts, date);//Only used by ContactManager.addMeetingNotes() to convert from
+		notes += note + "\n";//future to past meeting otherwise id is give by idStatic in MeetingImpl
 	}
 	public String getNotes() {
 		return notes;

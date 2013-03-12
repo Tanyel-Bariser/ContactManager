@@ -27,7 +27,7 @@ public class ContactTest {
 		assertEquals(contact.getName(), "Tanyel");
 	}
 	@Test
-	public void testsGetNotes() {
+	public void testsGetNotes() {//Adds "\n" at end of each new note is that is added
 		assertEquals(contact.getNotes(), "TestNote\n");
 	}
 	@Test

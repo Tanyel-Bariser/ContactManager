@@ -36,20 +36,23 @@ public class ContactManagerImpl implements ContactManager {
 				idMeetingsMap = new HashMap<>();
 			}
 		} catch (IOException | ClassNotFoundException ex) {
+			System.err.println("Error on read: " + ex);
 			ex.printStackTrace();
-			System.err.println("Error on read; " + ex);
 		} finally {
-			try {
-				if (input != null) {
-					input.close();
-				}
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.err.println("Error on read close: " + ex);
-			}
+			closeInputStream(input);
 		}
 	}
-	
+	//Seperate method (for clarity/simplicity) to close input stream within contructor method
+	private void closeInputStream(ObjectInputStream input) {
+		try {
+			if (input != null) {
+				input.close();
+			}
+		} catch (IOException ex) {
+			System.err.println("Error on read close: " + ex);
+			ex.printStackTrace();
+		}
+	}
 					/**************************************
 					*    SUPPLEMENTARY PRIVATE METHODS    *
 					**************************************/
@@ -262,17 +265,21 @@ public class ContactManagerImpl implements ContactManager {
 			output.writeObject(idContactsMap);
 			output.writeObject(idMeetingsMap);
 		} catch (IOException ex) {
-			ex.printStackTrace();
 			System.err.println("Error on write: " + ex);
+			ex.printStackTrace();
 		} finally {
-			try {
-				if (output != null) {
-					output.close();
-				}
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.err.println("Error on write close: " + ex);
+			closeOutputStream(output);
+		}
+	}
+	//Seperate method (for clarity/simplicity) to close output stream within flush method
+	private void closeOutputStream(ObjectOutputStream output) {
+		try {
+			if (output != null) {
+				output.close();
 			}
+		} catch (IOException ex) {
+			System.err.println("Error on write close: " + ex);
+			ex.printStackTrace();
 		}
 	}
 }

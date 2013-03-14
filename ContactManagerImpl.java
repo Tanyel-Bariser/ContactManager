@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -36,6 +37,9 @@ public class ContactManagerImpl implements ContactManager {
 				idContactsMap = new HashMap<>();
 				idMeetingsMap = new HashMap<>();
 			}
+		} catch (FileNotFoundException ex) {
+			System.err.println("File " + FILE + " does not exist.");
+			ex.printStackTrace();
 		} catch (IOException | ClassNotFoundException ex) {
 			System.err.println("Error on read: " + ex);
 			ex.printStackTrace();

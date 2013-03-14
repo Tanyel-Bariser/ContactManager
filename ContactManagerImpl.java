@@ -21,6 +21,7 @@ public class ContactManagerImpl implements ContactManager {
 	private static final String FILE = "contacts.txt";
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
+	private Calendar currentTime = Calendar.getInstance();
 	
 	@SuppressWarnings("unchecked")//Suppresses due to unchecked casts.
 	public ContactManagerImpl() {//Don't know what input.readObject() will be an instance of.
@@ -42,6 +43,10 @@ public class ContactManagerImpl implements ContactManager {
 			closeInputStream(input);
 		}
 	}
+
+					/******************************************
+					*    METHODS THAT CHECK FOR EXCEPTIONS    *
+					******************************************/
 	//Seperate method (for clarity/simplicity) to close input stream within contructor method
 	private void closeInputStream(ObjectInputStream input) {
 		try {
@@ -53,9 +58,17 @@ public class ContactManagerImpl implements ContactManager {
 			ex.printStackTrace();
 		}
 	}
-					/**************************************
-					*    SUPPLEMENTARY PRIVATE METHODS    *
-					**************************************/
+	//Seperate method (for clarity/simplicity) to close output stream within flush method
+	private void closeOutputStream(ObjectOutputStream output) {
+		try {
+			if (output != null) {
+				output.close();
+			}
+		} catch (IOException ex) {
+			System.err.println("Error on write close: " + ex);
+			ex.printStackTrace();
+		}
+	}
 	//Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
 	private void checkContactsAreKnown(Set<Contact> contacts) {
 		if (contacts == null) {
@@ -78,7 +91,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException(contact.getName() + " is an unknown contact");
 		}
 	}
-	//Following two methods checks date and text arguments for null, respectively.
+	//Following three methods checks date, text & meeting arguments for null, respectively.
 	private void checkForNull(Calendar date) {
 		if (date == null) {
 			throw new NullPointerException("Date points to null");
@@ -89,17 +102,41 @@ public class ContactManagerImpl implements ContactManager {
 			throw new NullPointerException("Text, i.e. name or notes, points to null");
 		}
 	}
+	private void checkForNull(Meeting meeting) {
+		if (meeting == null) {
+			throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " points to null.");
+		}
+	}
 	//Following two methods makes sure dates are in the past or future, respectively.
 	private void complainIfFuture(Calendar date) {
 		checkForNull(date);
-		if (date.after(Calendar.getInstance())) {
+		if (date.after(currentTime)) {
 			throw new IllegalArgumentException("Date of meeting should be in the past.");
 		}
 	}
 	private void complainIfPast(Calendar date) {
 		checkForNull(date);
-		if (date.before(Calendar.getInstance())) {
+		if (date.before(currentTime)) {
 			throw new IllegalArgumentException("Date of meeting should be in the future.");
+		}
+	}
+	//Throws IllegalStateException if meeting is set in future.
+	private void illegalStateIfFuture(Meeting meeting) {
+		checkForNull(meeting);
+		if (meeting.getDate().after(currentTime)) {
+			throw new IllegalStateException("Meeting with ID " + meeting.getId() + " is set for a date in the future.");
+		}
+	}
+	private void checkIDsForEmpty(int[] ids) {
+		if (ids == null) {
+			throw new NullPointerException("Contact IDs points to null.");
+		} else if (ids.length == 0) {
+			throw new IllegalArgumentException("Contact IDs is empty.");
+		}
+	}
+	private void checkIdIsKnown(int id) {	
+		if (!idContactsMap.containsKey(id)) {
+			throw new IllegalArgumentException("ID: " + id + " is unknown.");
 		}
 	}
 	
@@ -114,14 +151,11 @@ public class ContactManagerImpl implements ContactManager {
 	public void addMeetingNotes(int id, String text) {
 		Meeting meeting = getMeeting(id);
 		checkForNull(text);
-		if (meeting == null) {
-			throw new IllegalArgumentException("Meeting with ID " + id + " does not exist.");
-		} else if (meeting.getDate().after(Calendar.getInstance())) {
-			throw new IllegalStateException("Meeting with ID " + id + " is set for a date in the future.");
-		} else if (meeting instanceof PastMeetingImpl) {
+		illegalStateIfFuture(meeting);
+		if (meeting instanceof PastMeetingImpl) {
 			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;//Downcast because PastMeetingImpl has addNotes()
 			sameMeeting.addNotes(text);
-		} else {//Instanceof FutureMeeting and needs to be replaced by an instance of PastMeeting
+		} else {//Instance of FutureMeeting and needs to be replaced by an instance of PastMeeting
 			idMeetingsMap.remove(meeting);
 			Meeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
 			idMeetingsMap.put(id, pastMeeting);	
@@ -146,7 +180,6 @@ public class ContactManagerImpl implements ContactManager {
 	//Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
 	public PastMeeting getPastMeeting(int id) {
 		Meeting pastMeeting = getMeeting(id);
-		complainIfFuture(pastMeeting.getDate());
 		if (pastMeeting == null) {
 			return null;
 		} else if (!(pastMeeting instanceof PastMeeting)) {
@@ -159,7 +192,9 @@ public class ContactManagerImpl implements ContactManager {
 		checkContactIsKnown(contact);
 		List<PastMeeting> contactPastMeetings = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getContacts().contains(contact) && meeting.getDate().before(Calendar.getInstance())) {
+			boolean meetingContainsContact = meeting.getContacts().contains(contact);
+			boolean meetingIsInPast = meeting.getDate().before(currentTime);
+			if (meetingContainsContact && meetingIsInPast) {
 				if (!(meeting instanceof PastMeeting)) {
 					int id = meeting.getId();
 					addMeetingNotes(id, "");//Converts this meeting from FutureMeeting type to PastMeeting type
@@ -196,16 +231,20 @@ public class ContactManagerImpl implements ContactManager {
 	//Returns the FUTURE meeting with the requested ID, or null. Complains if the meeting is in the past.
 	public FutureMeeting getFutureMeeting(int id) {
 		Meeting futureMeeting = getMeeting(id);
+		if (futureMeeting == null) {
+			return null;
+		}
 		complainIfPast(futureMeeting.getDate());
 		return (FutureMeeting) futureMeeting;
 	}
-	
 	//Returns the list of sorted future meetings scheduled with this contact. Complains if contact is unknown.
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 		checkContactIsKnown(contact);
 		List<Meeting> contactFutureMeetings = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
-			if (meeting.getContacts().contains(contact) && meeting.getDate().after(Calendar.getInstance())) {
+			boolean meetingContainsContact = meeting.getContacts().contains(contact);
+			boolean meetingIsInFuture = meeting.getDate().after(currentTime);
+			if (meetingContainsContact && meetingIsInFuture) {
 				contactFutureMeetings.add(meeting);
 			}
 		}
@@ -226,19 +265,12 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	//Returns a list containing the contacts that correspond to the IDs.
 	public Set<Contact> getContacts(int... ids) {
-		if (ids == null) {
-			throw new NullPointerException("Contact IDs points to null.");
-		} else if (ids.length == 0) {
-			throw new IllegalArgumentException("Contact IDs is empty.");
-		}
+		checkIDsForEmpty(ids);
 		Set<Contact> contacts = new HashSet<>();
 		for (int i = 0; i < ids.length; i++) {
-			if (!idContactsMap.containsKey(ids[i])) {
-				throw new IllegalArgumentException("ID: " + ids[i] + " is unknown.");
-			} else {
-				Contact contact = idContactsMap.get(ids[i]);
-				contacts.add(contact);
-			}
+			checkIdIsKnown(ids[i]);
+			Contact contact = idContactsMap.get(ids[i]);
+			contacts.add(contact);
 		}
 		return contacts;
 	}
@@ -247,7 +279,8 @@ public class ContactManagerImpl implements ContactManager {
 		checkForNull(name);
 		Set<Contact> contacts = new HashSet<>();
 		for (Contact contact : idContactsMap.values()) {
-			if (contact.getName().toLowerCase().trim().equals(name.toLowerCase().trim())) {
+			boolean sameNameAsContact = contact.getName().toLowerCase().trim().equals(name.toLowerCase().trim());
+			if (sameNameAsContact) {
 				contacts.add(contact);
 			}
 		}
@@ -269,17 +302,6 @@ public class ContactManagerImpl implements ContactManager {
 			ex.printStackTrace();
 		} finally {
 			closeOutputStream(output);
-		}
-	}
-	//Seperate method (for clarity/simplicity) to close output stream within flush method
-	private void closeOutputStream(ObjectOutputStream output) {
-		try {
-			if (output != null) {
-				output.close();
-			}
-		} catch (IOException ex) {
-			System.err.println("Error on write close: " + ex);
-			ex.printStackTrace();
 		}
 	}
 }

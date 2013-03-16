@@ -26,39 +26,25 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 	private Calendar currentTime = Calendar.getInstance();
 	
 	public ContactManagerImpl() {
-		idContactsMap = new HashMap<>();
-		idMeetingsMap = new HashMap<>();
-		read();
+		if (new File(FILE).exists()) {
+			read();
+		} else {
+			idContactsMap = new HashMap<>();
+			idMeetingsMap = new HashMap<>();
+		}
 	}
 	//Suppresses due to unchecked casts.
 	@SuppressWarnings("unchecked")
 	public void read() {
-		ObjectInputStream input = null;
-		try {
-			if (new File(FILE).exists()) {
-				input = new ObjectInputStream(
-						new BufferedInputStream(new FileInputStream(FILE)));
-				idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST	
-				idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHECKED CAST
-			}
+		try (ObjectInputStream input = new ObjectInputStream(
+					new BufferedInputStream(new FileInputStream(FILE)));) {
+			idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST	
+			idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHECKED CAST
 		} catch (FileNotFoundException ex) {
 			System.err.println("File " + FILE + " does not exist.");
 			ex.printStackTrace();
 		} catch (IOException | ClassNotFoundException ex) {
 			System.err.println("Error on read: " + ex);
-			ex.printStackTrace();
-		} finally {
-			closeInputStream(input);
-		}
-	}
-	//Seperate method (for clarity/simplicity) to close input stream within read() method
-	private void closeInputStream(ObjectInputStream input) {
-		try {
-			if (input != null) {
-				input.close();
-			}
-		} catch (IOException ex) {
-			System.err.println("Error on read close: " + ex);
 			ex.printStackTrace();
 		}
 	}
@@ -163,7 +149,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 		}
 	}
 	//Returns the list of sorted meetings that are scheduled for, OR THAT TOOK PLACE ON, the specified date.
-	public List<Meeting> getFutureMeetingList(Calendar date) {//Better name would have been getMeetingList()
+	//Better name would have been getMeetingList()
+	public List<Meeting> getFutureMeetingList(Calendar date) {
 		checkForNull(date);
 		List<Meeting> meetingsList = new LinkedList<>();
 		for (Meeting meeting : idMeetingsMap.values()) {
@@ -296,10 +283,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 				*    SAVE ALL DATA TO DISK    *
 				******************************/
 	public void flush() {
-		ObjectOutputStream output = null;
-		try {
-			output = new ObjectOutputStream(
-					new BufferedOutputStream(new FileOutputStream(FILE)));
+		try (ObjectOutputStream output = new ObjectOutputStream(
+					new BufferedOutputStream(new FileOutputStream(FILE)));) {
 			output.writeObject(idContactsMap);
 			output.writeObject(idMeetingsMap);
 		}  catch (FileNotFoundException ex) {
@@ -307,19 +292,6 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 			ex.printStackTrace();
 		} catch (IOException ex) {
 			System.err.println("Error on write: " + ex);
-			ex.printStackTrace();
-		} finally {
-			closeOutputStream(output);
-		}
-	}
-	//Seperate method (for clarity/simplicity) to close output stream within flush method
-	private void closeOutputStream(ObjectOutputStream output) {
-		try {
-			if (output != null) {
-				output.close();
-			}
-		} catch (IOException ex) {
-			System.err.println("Error on write close: " + ex);
 			ex.printStackTrace();
 		}
 	}

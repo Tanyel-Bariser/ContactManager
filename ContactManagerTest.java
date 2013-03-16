@@ -48,16 +48,15 @@ public class ContactManagerTest {
 		pastDate = null;
 		futureDate = null;
 	}
-		/*************************************************************************
-		*    TESTS FOR addFutureMeeting(Set<Contact> contacts, Calendar date)    *
-		*************************************************************************/
+		/*****************************************************************************
+		*    TESTS FOR int addFutureMeeting(Set<Contact> contacts, Calendar date)    *
+		*****************************************************************************/
 	//Tests basic functionality of addFutureMeeting()
 	@Test
 	public void testsAddFutureMeeting() {
 		int id = manager.addFutureMeeting(manager.getContacts("Jake"), futureDate);
+		System.out.println(id);
 		assertEquals(manager.getContacts("Jake").size(), 1);
-		//ID number of THIRD contact added/created is 2... "Tanyel" = ID 0 & "John" = ID 1 were created in @Before buildUp()
-		assertEquals(manager.getContacts(2).size(), 1);
 		assertEquals(manager.getMeeting(id).getDate(), futureDate);
 		assertEquals(manager.getFutureMeetingList(futureDate).size(), 1);
 		assertEquals(manager.getFutureMeeting(id), manager.getMeeting(id));
@@ -91,10 +90,26 @@ public class ContactManagerTest {
 		manager.addFutureMeeting(contacts, futureDate);
 	}
 	
-	
-	
-	
-	
+		/*****************************************************
+		*    TESTS FOR PastMeeting getPastMeeting(int id)    *
+		*****************************************************/
+	//Tests basic functionality of getPastMeeting()
+	@Test
+	public void testsGetPastMeeting() {
+		assertEquals(manager.getPastMeeting(1), null);
+		manager.addNewPastMeeting(manager.getContacts("Jake"), pastDate, "Notes");
+		//ID number for meeting just added is 1
+		assertEquals(manager.getPastMeeting(1).getNotes(), "Notes\n");
+		assertEquals(manager.getPastMeeting(1).getDate(), pastDate);
+		assertEquals(manager.getPastMeeting(1).getContacts().size(), 1);
+	}
+	//Tests for future date
+	@Test (expected = IllegalArgumentException.class)
+	public void testsGetPastMeetingFutureDate() {
+		manager.addNewPastMeeting(manager.getContacts("Jake"), futureDate, "Notes");
+		//ID number for meeting just added is 1
+		manager.getPastMeeting(1);
+	}
 	
 	
 	

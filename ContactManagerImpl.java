@@ -25,7 +25,6 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 	private Map<Integer, Meeting> idMeetingsMap;
 	private Calendar currentTime = Calendar.getInstance();
 	
-	//Constructor with no parameters as an attempt to make class serialisable
 	public ContactManagerImpl() {
 		idContactsMap = new HashMap<>();
 		idMeetingsMap = new HashMap<>();
@@ -195,8 +194,9 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 		Meeting pastMeeting = getMeeting(id);
 		if (pastMeeting == null) {
 			return null;
-		} else if (!(pastMeeting instanceof PastMeeting)) {
-			complainIfFuture(pastMeeting.getDate());
+		}
+		complainIfFuture(pastMeeting.getDate());
+		if (!(pastMeeting instanceof PastMeeting)) {
 			//Converts this meeting from FutureMeeting type to PastMeeting type
 			addMeetingNotes(id, "");
 		}

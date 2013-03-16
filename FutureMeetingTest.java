@@ -2,7 +2,6 @@ import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -11,7 +10,7 @@ import java.util.Calendar;
 public class FutureMeetingTest {
 	private Contact contact1, contact2;
 	private Set<Contact> contacts;
-	private FutureMeeting meeting, meetingNext;
+	private Meeting meeting, meetingNext;
 	private Calendar date;
 	
 	@Before
@@ -35,7 +34,8 @@ public class FutureMeetingTest {
 		date = null;
 	}
 	@Test
-	public void testsGetId() {//Each time an instance of meeting is created the id is incremented by 1
+	public void testsGetId() {
+		//Each time an instance of meeting is created the id is incremented by 1
 		assertEquals(meeting.getId(), meetingNext.getId()-1);
 	}
 	@Test

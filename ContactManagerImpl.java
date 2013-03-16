@@ -51,11 +51,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 			closeInputStream(input);
 		}
 	}
-
-				/******************************************
-				*    METHODS THAT CHECK FOR EXCEPTIONS    *
-				******************************************/
-	//Seperate method (for clarity/simplicity) to close input stream within contructor method
+	//Seperate method (for clarity/simplicity) to close input stream within read() method
 	private void closeInputStream(ObjectInputStream input) {
 		try {
 			if (input != null) {
@@ -66,17 +62,10 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 			ex.printStackTrace();
 		}
 	}
-	//Seperate method (for clarity/simplicity) to close output stream within flush method
-	private void closeOutputStream(ObjectOutputStream output) {
-		try {
-			if (output != null) {
-				output.close();
-			}
-		} catch (IOException ex) {
-			System.err.println("Error on write close: " + ex);
-			ex.printStackTrace();
-		}
-	}
+
+				/******************************************
+				*    METHODS THAT CHECK FOR EXCEPTIONS    *
+				******************************************/
 	//Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
 	private void checkContactsAreKnown(Set<Contact> contacts) {
 		if (contacts == null) {
@@ -321,6 +310,17 @@ public class ContactManagerImpl implements ContactManager, Serializable {
 			ex.printStackTrace();
 		} finally {
 			closeOutputStream(output);
+		}
+	}
+	//Seperate method (for clarity/simplicity) to close output stream within flush method
+	private void closeOutputStream(ObjectOutputStream output) {
+		try {
+			if (output != null) {
+				output.close();
+			}
+		} catch (IOException ex) {
+			System.err.println("Error on write close: " + ex);
+			ex.printStackTrace();
 		}
 	}
 }

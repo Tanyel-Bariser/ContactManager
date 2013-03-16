@@ -37,7 +37,7 @@ public class ContactManagerImpl implements ContactManager {
 			} else {
 				idContactsMap = new HashMap<>();
 				idMeetingsMap = new HashMap<>();
-			/
+			}
 		} catch (FileNotFoundException ex) {
 			System.err.println("File " + FILE + " does not exist.");
 			ex.printStackTrace();
@@ -192,6 +192,7 @@ public class ContactManagerImpl implements ContactManager {
 		if (pastMeeting == null) {
 			return null;
 		} else if (!(pastMeeting instanceof PastMeeting)) {
+			complainIfFuture(pastMeeting.getDate());
 			//Converts this meeting from FutureMeeting type to PastMeeting type
 			addMeetingNotes(id, "");
 		}

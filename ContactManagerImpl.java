@@ -24,8 +24,9 @@ public class ContactManagerImpl implements ContactManager {
 	private Map<Integer, Meeting> idMeetingsMap;
 	private Calendar currentTime = Calendar.getInstance();
 	
-	@SuppressWarnings("unchecked")//Suppresses due to unchecked casts.
-	public ContactManagerImpl() {//Don't know what input.readObject() will be an instance of.
+	//Suppresses due to unchecked casts.
+	@SuppressWarnings("unchecked")
+	public ContactManagerImpl() {
 		ObjectInputStream input = null;
 		try {
 			if (new File(FILE).exists()) {
@@ -36,7 +37,7 @@ public class ContactManagerImpl implements ContactManager {
 			} else {
 				idContactsMap = new HashMap<>();
 				idMeetingsMap = new HashMap<>();
-			}
+			/
 		} catch (FileNotFoundException ex) {
 			System.err.println("File " + FILE + " does not exist.");
 			ex.printStackTrace();
@@ -48,9 +49,9 @@ public class ContactManagerImpl implements ContactManager {
 		}
 	}
 
-					/******************************************
-					*    METHODS THAT CHECK FOR EXCEPTIONS    *
-					******************************************/
+				/******************************************
+				*    METHODS THAT CHECK FOR EXCEPTIONS    *
+				******************************************/
 	//Seperate method (for clarity/simplicity) to close input stream within contructor method
 	private void closeInputStream(ObjectInputStream input) {
 		try {
@@ -131,6 +132,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalStateException("Meeting with ID " + meeting.getId() + " is set for a date in the future.");
 		}
 	}
+	//Checks that an integer array (specifically IDs) is not empty.
 	private void checkIDsForEmpty(int[] ids) {
 		if (ids == null) {
 			throw new NullPointerException("Contact IDs points to null.");
@@ -138,15 +140,16 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("Contact IDs is empty.");
 		}
 	}
-	private void checkIdIsKnown(int id) {	
+	//Checks that a contact id is known
+	private void checkContactIdIsKnown(int id) {	
 		if (!idContactsMap.containsKey(id)) {
 			throw new IllegalArgumentException("ID: " + id + " is unknown.");
 		}
 	}
 	
-					/***********************
-					*    MEETING METHODS   *
-					***********************/
+				/***********************
+				*    MEETING METHODS   *
+				***********************/
 	//Returns the meeting with the requested ID, or null if it there is none.
 	public Meeting getMeeting(int id) {
 		return idMeetingsMap.get(id);
@@ -157,9 +160,11 @@ public class ContactManagerImpl implements ContactManager {
 		checkForNull(text);
 		illegalStateIfFuture(meeting);
 		if (meeting instanceof PastMeetingImpl) {
-			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;//Downcast because PastMeetingImpl has addNotes()
+			//Downcast to use addNotes()
+			PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;
 			sameMeeting.addNotes(text);
-		} else {//Instance of FutureMeeting and needs to be replaced by an instance of PastMeeting
+		} else {
+			//Instance of FutureMeeting and needs to be replaced by an instance of PastMeeting
 			idMeetingsMap.remove(meeting);
 			Meeting pastMeeting = new PastMeetingImpl(id, meeting.getContacts(), meeting.getDate(), text);
 			idMeetingsMap.put(id, pastMeeting);	
@@ -178,16 +183,17 @@ public class ContactManagerImpl implements ContactManager {
 		return meetingsList;
 	}
 	
-					/****************************
-					*    PASTMEETING METHODS    *
-					****************************/
+				/****************************
+				*    PASTMEETING METHODS    *
+				****************************/
 	//Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
 	public PastMeeting getPastMeeting(int id) {
 		Meeting pastMeeting = getMeeting(id);
 		if (pastMeeting == null) {
 			return null;
 		} else if (!(pastMeeting instanceof PastMeeting)) {
-			addMeetingNotes(id, "");//Converts this meeting from FutureMeeting type to PastMeeting type
+			//Converts this meeting from FutureMeeting type to PastMeeting type
+			addMeetingNotes(id, "");
 		}
 		return (PastMeeting) getMeeting(id);
 	}
@@ -201,7 +207,8 @@ public class ContactManagerImpl implements ContactManager {
 			if (meetingContainsContact && meetingIsInPast) {
 				if (!(meeting instanceof PastMeeting)) {
 					int id = meeting.getId();
-					addMeetingNotes(id, "");//Converts this meeting from FutureMeeting type to PastMeeting type
+					//Converts this meeting from FutureMeeting type to PastMeeting type
+					addMeetingNotes(id, "");
 					meeting = getMeeting(id);
 				}
 				contactPastMeetings.add((PastMeeting) meeting);
@@ -220,9 +227,9 @@ public class ContactManagerImpl implements ContactManager {
 		idMeetingsMap.put(id, pastMeeting);
 	}
 	
-					/******************************
-					*    FUTUREMEETING METHODS    *
-					******************************/
+				/******************************
+				*    FUTUREMEETING METHODS    *
+				******************************/
 	//Adds a new meeting to be held in the future. Complains if a contact is unknown or if the date is in the past.
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		checkContactsAreKnown(contacts);
@@ -256,9 +263,9 @@ public class ContactManagerImpl implements ContactManager {
 		return contactFutureMeetings;
 	}
 	
-					/************************
-					*    CONTACT METHODS    *
-					************************/
+				/************************
+				*    CONTACT METHODS    *
+				************************/
 	//Create a new contact with the specified name and notes.
 	public void addNewContact(String name, String notes) {
 		checkForNull(name);
@@ -272,7 +279,7 @@ public class ContactManagerImpl implements ContactManager {
 		checkIDsForEmpty(ids);
 		Set<Contact> contacts = new HashSet<>();
 		for (int i = 0; i < ids.length; i++) {
-			checkIdIsKnown(ids[i]);
+			checkContactIdIsKnown(ids[i]);
 			Contact contact = idContactsMap.get(ids[i]);
 			contacts.add(contact);
 		}
@@ -291,9 +298,9 @@ public class ContactManagerImpl implements ContactManager {
 		return contacts;
 	}
 	
-					/******************************
-					*    SAVE ALL DATA TO DISK    *
-					******************************/
+				/******************************
+				*    SAVE ALL DATA TO DISK    *
+				******************************/
 	public void flush() {
 		ObjectOutputStream output = null;
 		try {
@@ -301,6 +308,9 @@ public class ContactManagerImpl implements ContactManager {
 					new BufferedOutputStream(new FileOutputStream(FILE)));
 			output.writeObject(idContactsMap);
 			output.writeObject(idMeetingsMap);
+		}  catch (FileNotFoundException ex) {
+			System.err.println("File " + FILE + " does not exist.");
+			ex.printStackTrace();
 		} catch (IOException ex) {
 			System.err.println("Error on write: " + ex);
 			ex.printStackTrace();

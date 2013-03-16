@@ -105,9 +105,10 @@ public class ContactManagerTest {
 	//Tests basic functionality of getPastMeeting()
 	@Test
 	public void testsGetPastMeeting() {
-		assertEquals(manager.getPastMeeting(pastId).getNotes(), "Notes\n");
-		assertEquals(manager.getPastMeeting(pastId).getDate(), pastDate);
-		assertEquals(manager.getPastMeeting(pastId).getContacts().size(), 1);
+		PastMeeting pastMeeting = manager.getPastMeeting(pastId);
+		assertEquals(pastMeeting.getNotes(), "Notes\n");
+		assertEquals(pastMeeting.getDate(), pastDate);
+		assertEquals(pastMeeting.getContacts().size(), 1);
 		assertEquals(manager.getPastMeeting(-10), null);
 	}
 	//Tests for future date
@@ -116,16 +117,15 @@ public class ContactManagerTest {
 		manager.getPastMeeting(futureId);
 	}
 		
-		/*********************************************************
-		*    TESTS FOR FutureMeeting getFutureMeeting(int id)    *
-		*********************************************************/
+		/********************************************************
+		*	TESTS FOR FutureMeeting getFutureMeeting(int id)	*
+		********************************************************/
 	//Tests basic functionality of getFutureMeeting()
 	@Test
 	public void testsGetFutureMeeting() {
 		FutureMeeting futureMeeting = manager.getFutureMeeting(futureId);
 		assertEquals(futureMeeting.getDate(), futureDate);
 		assertEquals(futureMeeting.getContacts().size(), 1);
-		assertEquals(manager.getFutureMeetingList(futureDate).size(), 1);
 		assertEquals(futureMeeting, manager.getMeeting(futureId));
 	}
 	//Tests for past date
@@ -134,4 +134,23 @@ public class ContactManagerTest {
 		manager.getFutureMeeting(pastId);
 	}
 	
+		/********************************************
+		*	TESTS FOR Meeting getMeeting(int id)	*
+		********************************************/
+	//Tests basic functionality of getMeeting()
+	@Test
+	public void testsGetMeeting() {
+		assertEquals(manager.getMeeting(-10), null);
+		//Tests for future meetings
+		FutureMeeting futureMeeting = (FutureMeeting) manager.getMeeting(futureId);
+		assertEquals(futureMeeting.getDate(), futureDate);
+		assertEquals(futureMeeting.getContacts().size(), 1);
+		assertEquals(futureMeeting, manager.getFutureMeeting(futureId));
+		
+		//Tests for past meetings
+		PastMeeting pastMeeting = (PastMeeting) manager.getMeeting(pastId);
+		assertEquals(pastMeeting.getNotes(), "Notes\n");
+		assertEquals(pastMeeting.getDate(), pastDate);
+		assertEquals(pastMeeting.getContacts().size(), 1);
+	}
 }

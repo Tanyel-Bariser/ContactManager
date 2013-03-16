@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 
+import java.io.Serializable;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -18,15 +19,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 //A class to manage your contacts and meetings
-public class ContactManagerImpl implements ContactManager {
+public class ContactManagerImpl implements ContactManager, Serializable {
 	private static final String FILE = "contacts.txt";
 	private Map<Integer, Contact> idContactsMap;
 	private Map<Integer, Meeting> idMeetingsMap;
 	private Calendar currentTime = Calendar.getInstance();
 	
+	//Constructor with no parameters as an attempt to make class serialisable
+	public ContactManagerImpl() {
+		idContactsMap = new HashMap<>();
+		idMeetingsMap = new HashMap<>();
+		read();
+	}
 	//Suppresses due to unchecked casts.
 	@SuppressWarnings("unchecked")
-	public ContactManagerImpl() {
+	public void read() {
 		ObjectInputStream input = null;
 		try {
 			if (new File(FILE).exists()) {
@@ -34,9 +41,6 @@ public class ContactManagerImpl implements ContactManager {
 						new BufferedInputStream(new FileInputStream(FILE)));
 				idContactsMap = (Map<Integer, Contact>) input.readObject();//UNCHECKED CAST	
 				idMeetingsMap = (Map<Integer, Meeting>) input.readObject();//UNCHECKED CAST
-			} else {
-				idContactsMap = new HashMap<>();
-				idMeetingsMap = new HashMap<>();
 			}
 		} catch (FileNotFoundException ex) {
 			System.err.println("File " + FILE + " does not exist.");

@@ -1,5 +1,4 @@
 import org.junit.Test;
-import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
@@ -11,7 +10,7 @@ import java.util.Calendar;
 public class PastMeetingTest {
 	private Contact contact1, contact2;
 	private Set<Contact> contacts;
-	private PastMeeting meeting, meetingNext;
+	private Meeting meeting, meetingNext;
 	private Calendar date;
 	
 	@Before
@@ -35,7 +34,8 @@ public class PastMeetingTest {
 		date = null;
 	}
 	@Test
-	public void testsGetId() {//Each time an instance of meeting is created the id is incremented by 1
+	public void testsGetId() {
+		//Each time an instance of meeting is created the id is incremented by 1
 		assertEquals(meeting.getId(), meetingNext.getId()-1);
 	}
 	@Test
@@ -47,7 +47,17 @@ public class PastMeetingTest {
 		assertEquals(contacts, meeting.getContacts());
 	}
 	@Test
-	public void testsGetNotes() {//PastMeetingImpl constructor method automatically adds "\n" to the end of each new note
-		assertEquals(meeting.getNotes(), "MeetingNotes\n");
+	public void testsGetNotes() {
+		//PastMeeting has getNotes()
+		PastMeeting pastMeeting = (PastMeeting) meeting;
+		//Constructor method automatically adds "\n" to the end of each new note
+		assertEquals(pastMeeting.getNotes(), "MeetingNotes\n");
+	}
+	@Test
+	public void testsAddNotes() {
+		//Only PastMeetingImpl has addNotes()
+		PastMeetingImpl pastMeetingImpl = (PastMeetingImpl) meeting;
+		pastMeetingImpl.addNotes("&MoreNotes.");
+		assertEquals(pastMeetingImpl.getNotes(), "MeetingNotes\n&MoreNotes.\n");
 	}
 }

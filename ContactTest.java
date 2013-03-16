@@ -2,8 +2,6 @@ import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
 //A class to test the methods of ContactImpl
 public class ContactTest {
 	private Contact contact, contactNext;
@@ -27,7 +25,8 @@ public class ContactTest {
 		assertEquals(contact.getName(), "Tanyel");
 	}
 	@Test
-	public void testsGetNotes() {//Adds "\n" at end of each new note is that is added
+	public void testsGetNotes() {
+		//Adds "\n" at end of each new note is that is added
 		assertEquals(contact.getNotes(), "TestNote\n");
 	}
 	@Test

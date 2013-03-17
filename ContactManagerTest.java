@@ -210,7 +210,7 @@ public class ContactManagerTest {
 		/****************************************************************************************
 		*	TESTS FOR void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text)	*
 		****************************************************************************************/
-	//Tests basic functionality of addNewPastMeeting
+	//Tests basic functionality of addNewPastMeeting()
 	@Test
 	public void testsAddNewPastMeeting() {
 		manager.addNewPastMeeting(manager.getContacts("pastJake"), pastDate, "New notes");
@@ -241,5 +241,15 @@ public class ContactManagerTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testsAddNewPastMeetingUnknownContact() {
 		manager.addNewPastMeeting(contacts, pastDate, "");
+	}
+		/********************************************************
+		*	TESTS FOR void addMeetingNotes(int id, String text)	*
+		********************************************************/
+	//Tests basic functionality of addMeetingNotes()
+	@Test
+	public void testsAddMeetingNotes() {
+		manager.addMeetingNotes(pastId, "New notes");
+		PastMeeting pastMeeting = (PastMeeting) manager.getMeeting(pastId);
+		assertEquals(pastMeeting.getNotes(), "Notes\nNew notes\n");
 	}
 }

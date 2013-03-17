@@ -221,7 +221,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param text messages to be added about the meeting.
     * @throws IllegalArgumentException if the meeting does not exist
     * @throws IllegalStateException if the meeting is set for a date in the future
-    * @throws NullPointerException if the notes or date are null
+    * @throws NullPointerException if the notes, meeting or date are null
     */
     public void addMeetingNotes(int id, String text) {
         Meeting meeting = getMeeting(id);
@@ -254,7 +254,9 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         checkForNull(date);
         List<Meeting> meetingsList = new LinkedList<>();
         for (Meeting meeting : idMeetingsMap.values()) {
-            if (meeting.getDate().equals(date)) {
+            boolean meetingOnDate = meeting.getDate().equals(date);
+            boolean noDuplicates = !meetingsList.contains(meeting);
+            if (meetingOnDate && noDuplicates) {
                 meetingsList.add(meeting);
             }
         }

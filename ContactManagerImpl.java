@@ -61,20 +61,6 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 *    METHODS THAT CHECK FOR EXCEPTIONS    *
                 ******************************************/
     /**
-    * Checks whether a specified meeting is known
-    * 
-    * @param meeting to be checked whether it is known
-    * @throws NullPointerException if meeting points to null
-    * @throws IllegalArgumentException if meeting is unknown
-    */
-    private void checkMeetingIsKnown(Meeting meeting) {
-        if (meeting == null) {
-            throw new NullPointerException("Meeting points to null.");
-        } else if (!idMeetingsMap.containsValue(meeting)) {
-            throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " is unknown.");
-        }
-    }
-    /**
     * Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
     * 
     * @param contacts set to check whether they are known by instance of ContactManagerImpl
@@ -106,6 +92,20 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             throw new NullPointerException("Contact points to null.");
         } else if (!idContactsMap.containsValue(contact)) {
             throw new IllegalArgumentException(contact.getName() + " is an unknown contact.");
+        }
+    }
+    /**
+    * Checks whether a specified meeting is known
+    * 
+    * @param meeting to be checked whether it is known
+    * @throws NullPointerException if meeting points to null
+    * @throws IllegalArgumentException if meeting is unknown
+    */
+    private void checkMeetingIsKnown(Meeting meeting) {
+        if (meeting == null) {
+            throw new NullPointerException("Meeting points to null.");
+        } else if (!idMeetingsMap.containsValue(meeting)) {
+            throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " is unknown.");
         }
     }
     /**
@@ -327,8 +327,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param contacts a list of participants
     * @param date the date on which the meeting took place
     * @param text messages to be added about the meeting.
-    * @throws IllegalArgumentException if the list of contacts is
-    * empty, or any of the contacts does not exist
+    * @throws IllegalArgumentException if the list of contacts is empty, or any
+    * of the contacts does not exist or if date of meeting is in the future
     * @throws NullPointerException if any of the arguments is null
     */
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
@@ -352,7 +352,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param date the date on which the meeting will take place
     * @return the ID for the meeting
     * @throws IllegalArgumentException if the meeting is set for a time in the past,
-    * of if any contact is unknown / non-existent
+    * of if any contact is unknown / non-existent or if the set of contacts is empty
     * @throws NullPointerException if contacts or date points to null
     */
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
@@ -397,7 +397,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         for (Meeting meeting : idMeetingsMap.values()) {
             boolean meetingContainsContact = meeting.getContacts().contains(contact);
             boolean meetingIsInFuture = meeting.getDate().after(currentTime);
-            if (meetingContainsContact && meetingIsInFuture) {
+            boolean notDuplicate = !contactFutureMeetings.contains(meeting);
+            if (meetingContainsContact && meetingIsInFuture && notDuplicate) {
                 contactFutureMeetings.add(meeting);
             }
         }

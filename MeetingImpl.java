@@ -28,7 +28,7 @@ public abstract class MeetingImpl implements Meeting, Serializable {
         this.contacts = contacts;
     }
     /**
-    * Second constructor to allow ID as argument
+    * Constructor to allow ID as argument
     * 
     * Only for PastMeetingImpl. Used by the ContactManager.addMeetingNotes() method to convert to PastMeeting type and keep same id
     *

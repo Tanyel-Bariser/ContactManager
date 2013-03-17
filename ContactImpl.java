@@ -24,7 +24,7 @@ public class ContactImpl implements Contact, Serializable {
     public ContactImpl(String name, String newNote) {
         //Prevents more than one contact having the same id
         id = idStatic++;
-		this.name = new StringBuilder(name);
+        this.name = new StringBuilder(name);
         this.notes = new StringBuilder(newNote + "\n");
     }
     /**

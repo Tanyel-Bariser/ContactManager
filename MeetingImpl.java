@@ -17,7 +17,7 @@ public abstract class MeetingImpl implements Meeting, Serializable {
     */
     public MeetingImpl() {}
     /**
-    * Constructor for MeetImpl
+    * Constructor for MeetingImpl
     *
     * @param contacts to be added to the meeting
     * @param date of meeting to be held

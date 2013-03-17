@@ -95,6 +95,18 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         }
     }
     /**
+    * Checks that a contact id is known.
+    * 
+    * @param id the ID of the contact
+    * @throws IllegalArgumentException if contact's id is unknown
+    */
+    private void checkContactIdIsKnown(int id) {
+		boolean unknownContact = !idContactsMap.containsKey(id);
+        if (unknownContact) {
+            throw new IllegalArgumentException("The contact with the ID number " + id + " is unknown.");
+        }
+    }
+    /**
     * Checks whether a specified meeting is known
     * 
     * @param meeting to be checked whether it is known
@@ -181,17 +193,6 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             throw new NullPointerException("Contact IDs array points to null.");
         } else if (ids.length == 0) {
             throw new IllegalArgumentException("Contact IDs array is empty.");
-        }
-    }
-    /**
-    * Checks that a contact id is known.
-    * 
-    * @param id the ID of the contact
-    * @throws IllegalArgumentException if contact's id is unknown
-    */
-    private void checkContactIdIsKnown(int id) {	
-        if (!idContactsMap.containsKey(id)) {
-            throw new IllegalArgumentException("The contact with the ID number " + id + " is unknown.");
         }
     }
 	

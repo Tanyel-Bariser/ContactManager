@@ -178,9 +178,9 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkIDsForEmpty(int[] ids) {
         if (ids == null) {
-            throw new NullPointerException("Contact IDs point to null.");
+            throw new NullPointerException("Contact IDs array points to null.");
         } else if (ids.length == 0) {
-            throw new IllegalArgumentException("Contact IDs is empty.");
+            throw new IllegalArgumentException("Contact IDs array is empty.");
         }
     }
     /**
@@ -191,7 +191,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkContactIdIsKnown(int id) {	
         if (!idContactsMap.containsKey(id)) {
-            throw new IllegalArgumentException("ID: " + id + " is unknown.");
+            throw new IllegalArgumentException("The contact with the ID number " + id + " is unknown.");
         }
     }
 	
@@ -444,7 +444,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         return contacts;
     }
     /**
-    * Returns a list with the contacts whose name contains that string.
+    * Returns a list, possibly empty, with the contacts whose name contains that string.
     *
     * @param name the string to search for
     * @return a list with the contacts whose name contains that string.

@@ -61,6 +61,20 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 *    METHODS THAT CHECK FOR EXCEPTIONS    *
                 ******************************************/
     /**
+    * Checks whether a specified meeting is known
+    * 
+    * @param meeting to be checked whether it is known
+    * @throws NullPointerException if meeting points to null
+    * @throws IllegalArgumentException if meeting is unknown
+    */
+    private void checkMeetingIsKnown(Meeting meeting) {
+        if (meeting == null) {
+            throw new NullPointerException("Meeting points to null.");
+        } else if (!idMeetingsMap.containsValue(meeting)) {
+            throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " is unknown.");
+        }
+    }
+    /**
     * Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
     * 
     * @param contacts set to check whether they are known by instance of ContactManagerImpl
@@ -69,14 +83,14 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkContactsAreKnown(Set<Contact> contacts) {
         if (contacts == null) {
-            throw new NullPointerException("Set of contacts point to null");
+            throw new NullPointerException("Set of contacts point to null.");
         } else if (contacts.isEmpty()) {
             throw new IllegalArgumentException("Set of contacts is empty.");
         }
         for (Contact contact : contacts) {
             boolean unknownContact = !idContactsMap.containsValue(contact);
             if (unknownContact) {
-                throw new IllegalArgumentException(contact.getName() + " is an unknown contact");
+                throw new IllegalArgumentException(contact.getName() + " is an unknown contact.");
             }
         }
     }
@@ -89,9 +103,9 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkContactIsKnown(Contact contact) {
         if (contact == null) {
-            throw new NullPointerException("Contact points to null");
+            throw new NullPointerException("Contact points to null.");
         } else if (!idContactsMap.containsValue(contact)) {
-            throw new IllegalArgumentException(contact.getName() + " is an unknown contact");
+            throw new IllegalArgumentException(contact.getName() + " is an unknown contact.");
         }
     }
     /**
@@ -102,7 +116,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkForNull(Calendar date) {
         if (date == null) {
-            throw new NullPointerException("Date points to null");
+            throw new NullPointerException("Date points to null.");
         }
     }
     /**
@@ -113,18 +127,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkForNull(String text) {
         if (text == null) {
-            throw new NullPointerException("Text, i.e. name or notes, points to null");
-        }
-    }
-    /**
-    * Checks meeting for null
-    *
-    * @param meeting to check for null
-    * @throws IllegalArgumentException if meeting points to null
-    */
-    private void checkForNull(Meeting meeting) {
-        if (meeting == null) {
-            throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " points to null.");
+            throw new NullPointerException("Text, i.e. name or notes, points to null.");
         }
     }
     /**
@@ -155,11 +158,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * Throws IllegalStateException if meeting is set in future.
     *
     * @param meeting to check for date
-    * @throws NullPointerException if date points to null
+    * @throws NullPointerException if meeting or date points to null
     * @throws IllegalStateException if meeting is set in future
+    * @throws IllegalArgumentException if meeting is unknown
     */
     private void illegalStateIfFuture(Meeting meeting) {
-        checkForNull(meeting);
+        checkMeetingIsKnown(meeting);
+		checkForNull(meeting.getDate());
         if (meeting.getDate().after(currentTime)) {
             throw new IllegalStateException("Meeting with ID " + meeting.getId() + " is set for a date in the future.");
         }

@@ -18,7 +18,9 @@ import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-//A class to manage your contacts and meetings
+/**
+* A class to manage your contacts and meetings.
+*/
 public class ContactManagerImpl implements ContactManager, Serializable {
     private static final String FILE = "contacts.txt";
     private Map<Integer, Contact> idContactsMap;
@@ -128,11 +130,29 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 /***********************
                 *    MEETING METHODS   *
                 ***********************/
-    //Returns the meeting with the requested ID, or null if it there is none.
+    /**
+    * Returns the meeting with the requested ID, or null if it there is none.
+    *
+    * @param id the ID for the meeting
+    * @return the meeting with the requested ID, or null if it there is none.
+    */
     public Meeting getMeeting(int id) {
         return idMeetingsMap.get(id);
     }
-    //Adds notes to a past meeting or converts future meeting to a past meeting then adds notes
+    /**
+    * Add notes to a meeting.
+    *
+    * This method is used when a future meeting takes place, and is
+    * then converted to a past meeting (with notes).
+    *
+    * It can be also used to add notes to a past meeting at a later date.
+    *
+    * @param id the ID of the meeting
+    * @param text messages to be added about the meeting.
+    * @throws IllegalArgumentException if the meeting does not exist
+    * @throws IllegalStateException if the meeting is set for a date in the future
+    * @throws NullPointerException if the notes are null
+    */
     public void addMeetingNotes(int id, String text) {
         Meeting meeting = getMeeting(id);
         checkForNull(text);
@@ -148,8 +168,17 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             idMeetingsMap.put(id, pastMeeting);	
         }
     }
-    //Returns the list of sorted meetings that are scheduled for, OR THAT TOOK PLACE ON, the specified date.
-    //Better name would have been getMeetingList()
+    /**
+    * Returns the list of meetings that are scheduled for, or that took
+    * place on, the specified date
+    *
+    * If there are none, the returned list will be empty. Otherwise,
+    * the list will be chronologically sorted and will not contain any
+    * duplicates.
+    *
+    * @param date the date
+    * @return the list of meetings
+    */
     public List<Meeting> getFutureMeetingList(Calendar date) {
         checkForNull(date);
         List<Meeting> meetingsList = new LinkedList<>();
@@ -165,7 +194,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 /****************************
                 *    PASTMEETING METHODS    *
                 ****************************/
-    //Returns the PAST meeting with the requested ID, or null. Complains if the meeting is in the future.
+    /**
+    * Returns the PAST meeting with the requested ID, or null if it there is none.
+    *
+    * @param id the ID for the meeting
+    * @return the meeting with the requested ID, or null if it there is none.
+    * @throws IllegalArgumentException if there is a meeting with that ID happening in the future
+    */
     public PastMeeting getPastMeeting(int id) {
         Meeting pastMeeting = getMeeting(id);
         if (pastMeeting == null) {
@@ -178,7 +213,17 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         }
         return (PastMeeting) getMeeting(id);
     }
-    //Returns the list of past meetings in which this contact has participated. Complains if contact is unknown.
+    /**
+    * Returns the list of past meetings in which this contact has participated.
+    *
+    * If there are none, the returned list will be empty. Otherwise,
+    * the list will be chronologically sorted and will not contain any
+    * duplicates.
+    *
+    * @param contact one of the user’s contacts
+    * @return the list of future meeting(s) scheduled with this contact (maybe empty).
+    * @throws IllegalArgumentException if the contact does not exist
+    */
     public List<PastMeeting> getPastMeetingList(Contact contact) {
         checkContactIsKnown(contact);
         List<PastMeeting> contactPastMeetings = new LinkedList<>();
@@ -198,7 +243,16 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         Collections.sort(contactPastMeetings, new DateMeetingComparator());
         return contactPastMeetings;
     }
-    //Create a new record for a meeting that took place in the past.
+    /**
+    * Create a new record for a meeting that took place in the past.
+    *
+    * @param contacts a list of participants
+    * @param date the date on which the meeting took place
+    * @param text messages to be added about the meeting.
+    * @throws IllegalArgumentException if the list of contacts is
+    * empty, or any of the contacts does not exist
+    * @throws NullPointerException if any of the arguments is null
+    */
     public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
         checkContactsAreKnown(contacts);
         complainIfFuture(date);
@@ -211,7 +265,15 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 /******************************
                 *    FUTUREMEETING METHODS    *
                 ******************************/
-    //Adds a new meeting to be held in the future. Complains if a contact is unknown or if the date is in the past.
+    /**
+    * Add a new meeting to be held in the future.
+    *
+    * @param contacts a list of contacts that will participate in the meeting
+    * @param date the date on which the meeting will take place
+    * @return the ID for the meeting
+    * @throws IllegalArgumentException if the meeting is set for a time in the past,
+    * of if any contact is unknown / non-existent
+    */
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
         checkContactsAreKnown(contacts);
         complainIfPast(date);
@@ -220,7 +282,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         idMeetingsMap.put(id, futureMeeting);
         return id;
     }
-    //Returns the FUTURE meeting with the requested ID, or null. Complains if the meeting is in the past.
+    /**
+    * Returns the FUTURE meeting with the requested ID, or null if there is none.
+    *
+    * @param id the ID for the meeting
+    * @return the meeting with the requested ID, or null if it there is none.
+    * @throws IllegalArgumentException if there is a meeting with that ID happening in the past
+    */
     public FutureMeeting getFutureMeeting(int id) {
         Meeting futureMeeting = getMeeting(id);
         if (futureMeeting == null) {
@@ -229,7 +297,17 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         complainIfPast(futureMeeting.getDate());
         return (FutureMeeting) futureMeeting;
     }
-    //Returns the list of sorted future meetings scheduled with this contact. Complains if contact is unknown.
+    /**
+    * Returns the list of future meetings scheduled with this contact.
+    *
+    * If there are none, the returned list will be empty. Otherwise,
+    * the list will be chronologically sorted and will not contain any
+    * duplicates.
+    *
+    * @param contact one of the user’s contacts
+    * @return the list of future meeting(s) scheduled with this contact (maybe empty).
+    * @throws IllegalArgumentException if the contact does not exist
+    */
     public List<Meeting> getFutureMeetingList(Contact contact) {
         checkContactIsKnown(contact);
         List<Meeting> contactFutureMeetings = new LinkedList<>();
@@ -247,7 +325,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 /************************
                 *    CONTACT METHODS    *
                 ************************/
-    //Create a new contact with the specified name and notes.
+    /**
+    * Create a new contact with the specified name and notes.
+    *
+    * @param name the name of the contact.
+    * @param notes notes to be added about the contact.
+    * @throws NullPointerException if the name or the notes are null
+    */
     public void addNewContact(String name, String notes) {
         checkForNull(name);
         checkForNull(notes);
@@ -255,7 +339,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         int id = newContact.getId();
         idContactsMap.put(id, newContact);
     }
-    //Returns a list containing the contacts that correspond to the IDs.
+    /**
+    * Returns a list containing the contacts that correspond to the IDs.
+    *
+    * @param ids an arbitrary number of contact IDs
+    * @return a list containing the contacts that correspond to the IDs.
+    * @throws IllegalArgumentException if any of the IDs does not correspond to a real contact
+    */
     public Set<Contact> getContacts(int... ids) {
         checkIDsForEmpty(ids);
         Set<Contact> contacts = new HashSet<>();
@@ -266,7 +356,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         }
         return contacts;
     }
-    //Returns a list with the contacts whose name contains that string.
+    /**
+    * Returns a list with the contacts whose name contains that string.
+    *
+    * @param name the string to search for
+    * @return a list with the contacts whose name contains that string.
+    * @throws NullPointerException if the parameter is null
+    */
     public Set<Contact> getContacts(String name) {
         checkForNull(name);
         Set<Contact> contacts = new HashSet<>();
@@ -282,6 +378,12 @@ public class ContactManagerImpl implements ContactManager, Serializable {
                 /******************************
                 *    SAVE ALL DATA TO DISK    *
                 ******************************/
+    /**
+    * Save all data to disk.
+    *
+    * This method must be executed when the program is
+    * closed and when/if the user requests it.
+    */
     public void flush() {
         try (ObjectOutputStream output = new ObjectOutputStream(
                 new BufferedOutputStream(new FileOutputStream(FILE)));) {

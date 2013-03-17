@@ -101,7 +101,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @throws IllegalArgumentException if contact's id is unknown
     */
     private void checkContactIdIsKnown(int id) {
-		boolean unknownContact = !idContactsMap.containsKey(id);
+        boolean unknownContact = !idContactsMap.containsKey(id);
         if (unknownContact) {
             throw new IllegalArgumentException("The contact with the ID number " + id + " is unknown.");
         }
@@ -176,7 +176,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void illegalStateIfFuture(Meeting meeting) {
         checkMeetingIsKnown(meeting);
-		checkForNull(meeting.getDate());
+        checkForNull(meeting.getDate());
         if (meeting.getDate().after(currentTime)) {
             throw new IllegalStateException("Meeting with ID " + meeting.getId() + " is set for a date in the future.");
         }

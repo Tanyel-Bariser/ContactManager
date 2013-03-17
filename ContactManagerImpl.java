@@ -25,7 +25,6 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     private Map<Integer, Contact> idContactsMap;
     private Map<Integer, Meeting> idMeetingsMap;
     private Calendar currentTime = Calendar.getInstance();
-	
     /**
     * Constructor method for ContactManagerImpl
     */
@@ -66,8 +65,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * 
     * @param contacts set to check whether they are known by instance of ContactManagerImpl
     * @throws NullPointerException if set of contacts point to null
-    * @throws IllegalArgumentException if set of contacts is empty
-    * @throws IllegalArgumentException if one or more contact(s) is unknown
+    * @throws IllegalArgumentException if set of contacts is empty or if one or more contact(s) is unknown
     */
     private void checkContactsAreKnown(Set<Contact> contacts) {
         if (contacts == null) {
@@ -175,7 +173,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     */
     private void checkIDsForEmpty(int[] ids) {
         if (ids == null) {
-            throw new NullPointerException("Contact IDs points to null.");
+            throw new NullPointerException("Contact IDs point to null.");
         } else if (ids.length == 0) {
             throw new IllegalArgumentException("Contact IDs is empty.");
         }
@@ -218,7 +216,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param text messages to be added about the meeting.
     * @throws IllegalArgumentException if the meeting does not exist
     * @throws IllegalStateException if the meeting is set for a date in the future
-    * @throws NullPointerException if the notes are null
+    * @throws NullPointerException if the notes or date are null
     */
     public void addMeetingNotes(int id, String text) {
         Meeting meeting = getMeeting(id);
@@ -245,6 +243,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     *
     * @param date the date
     * @return the list of meetings
+    * @throws NullPointerException if date points to null
     */
     public List<Meeting> getFutureMeetingList(Calendar date) {
         checkForNull(date);
@@ -268,6 +267,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     *
     * @param id the ID for the meeting
     * @return the meeting with the requested ID, or null if it there is none.
+    * @throws NullPointerException if date points to null
     * @throws IllegalArgumentException if there is a meeting with that ID happening in the future
     */
     public PastMeeting getPastMeeting(int id) {
@@ -292,6 +292,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param contact one of the user’s contacts
     * @return the list of future meeting(s) scheduled with this contact (maybe empty).
     * @throws IllegalArgumentException if the contact does not exist
+    * @throws NullPointerException if contact points to null
     */
     public List<PastMeeting> getPastMeetingList(Contact contact) {
         checkContactIsKnown(contact);
@@ -344,6 +345,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @return the ID for the meeting
     * @throws IllegalArgumentException if the meeting is set for a time in the past,
     * of if any contact is unknown / non-existent
+    * @throws NullPointerException if contacts or date points to null
     */
     public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
         checkContactsAreKnown(contacts);
@@ -359,6 +361,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param id the ID for the meeting
     * @return the meeting with the requested ID, or null if it there is none.
     * @throws IllegalArgumentException if there is a meeting with that ID happening in the past
+    * @throws NullPointerException if date of meeting points to null
     */
     public FutureMeeting getFutureMeeting(int id) {
         Meeting futureMeeting = getMeeting(id);
@@ -378,6 +381,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param contact one of the user’s contacts
     * @return the list of future meeting(s) scheduled with this contact (maybe empty).
     * @throws IllegalArgumentException if the contact does not exist
+    * @throws NullPointerException if contact points to null
     */
     public List<Meeting> getFutureMeetingList(Contact contact) {
         checkContactIsKnown(contact);
@@ -417,7 +421,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     *
     * @param ids an arbitrary number of contact IDs
     * @return a list containing the contacts that correspond to the IDs.
-    * @throws IllegalArgumentException if any of the IDs does not correspond to a real contact
+    * @throws IllegalArgumentException if any of the IDs does not correspond to a real contact or if IDs is empty
+    * @throws NullPointerException if contact IDs point to null
     */
     public Set<Contact> getContacts(int... ids) {
         checkIDsForEmpty(ids);

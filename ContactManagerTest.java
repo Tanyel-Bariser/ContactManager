@@ -294,9 +294,34 @@ public class ContactManagerTest {
 		/*******************************************************
 		*    TESTS FOR Set<Contact> getContacts(int... ids)    *
 		*******************************************************/
+	//Tests basic functionality of getContacts(int... ids)
+	@Test
+	public void testsGetContactsIDs() {
+		Set<Contact> contacts = manager.getContacts(pastContact.getId(), futureContact.getId());
+		assertEquals(contacts.size(), 2);
+	}
 	//Tests for unknown contact
 	@Test (expected = IllegalArgumentException.class)
 	public void testsGetContactsUnknownContact() {
 		manager.getContacts(-1);
+	}
+		/********************************************************
+		*    TESTS FOR Set<Contact> getContacts(String name)    *
+		********************************************************/
+	//Test getContacts(String name)
+	@Test
+	public void testsGetContacts() {
+		Set<Contact> contacts = manager.getContacts("futureJake");
+		assertEquals(contacts.size(), 1);
+		contacts = manager.getContacts("pastJake");
+		assertEquals(contacts.size(), 1);
+		contacts = manager.getContacts("unknown person");
+		assertEquals(contacts.size(), 0);
+	}
+	//Tests null contact
+	@Test (expected = NullPointerException.class)
+	public void testsGetNullContacts() {
+		String name = null;
+		manager.getContacts(name);
 	}
 }

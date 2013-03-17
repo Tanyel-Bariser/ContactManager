@@ -40,9 +40,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     }
     /**
     * Reads from file contacts.txt
-    *
-    * Suppresses warnings due to unchecked casts.
     */
+    //Suppresses warnings due to unchecked casts.
     @SuppressWarnings("unchecked")
     public void read() {
         try (ObjectInputStream input = new ObjectInputStream(

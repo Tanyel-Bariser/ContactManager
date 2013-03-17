@@ -8,8 +8,8 @@ import java.io.Serializable;
 public class ContactImpl implements Contact, Serializable {
     private static int idStatic = 0;
     private int id;
-    private String name;
-    private String notes;
+    private StringBuilder name;
+    private StringBuilder notes;
 	
     /**
     * Constructor with no parameters to make class serialisable
@@ -24,11 +24,11 @@ public class ContactImpl implements Contact, Serializable {
     public ContactImpl(String name, String newNote) {
         //Prevents more than one contact having the same id
         id = idStatic++;
-        this.name = name;
-        notes = newNote + "\n";
+		this.name = new StringBuilder(name);
+        this.notes = new StringBuilder(newNote + "\n");
     }
     /**
-    * Second constructor that only takes name
+    * Constructor that only takes name
     *
     * @param name of contact
     */
@@ -49,7 +49,7 @@ public class ContactImpl implements Contact, Serializable {
     * @return the name of the contact.
     */
     public String getName() {
-        return name;
+        return name.toString();
     }
     /**
     * Returns our notes about the contact, if any.
@@ -60,7 +60,7 @@ public class ContactImpl implements Contact, Serializable {
     * @return a string with notes about the contact, maybe empty.
     */
     public String getNotes() {
-        return notes;
+        return notes.toString();
     }
     /**
     * Add notes about the contact.
@@ -68,6 +68,6 @@ public class ContactImpl implements Contact, Serializable {
     * @param note the notes to be added
     */
     public void addNotes(String newNote) {
-        notes += newNote + "\n";
+        notes.append(newNote + "\n");
     }		
 }

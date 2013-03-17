@@ -129,9 +129,9 @@ public class ContactManagerTest {
 		manager.getPastMeeting(futureId);
 	}
 		
-		/********************************************************
-		*	TESTS FOR FutureMeeting getFutureMeeting(int id)	*
-		********************************************************/
+		/*********************************************************
+		*    TESTS FOR FutureMeeting getFutureMeeting(int id)    *
+		*********************************************************/
 	//Tests basic functionality of getFutureMeeting()
 	@Test
 	public void testsGetFutureMeeting() {
@@ -146,9 +146,9 @@ public class ContactManagerTest {
 		manager.getFutureMeeting(pastId);
 	}
 	
-		/********************************************
-		*	TESTS FOR Meeting getMeeting(int id)	*
-		********************************************/
+		/*********************************************
+		*    TESTS FOR Meeting getMeeting(int id)    *
+		*********************************************/
 	//Tests basic functionality of getMeeting()
 	@Test
 	public void testsGetMeeting() {
@@ -166,9 +166,9 @@ public class ContactManagerTest {
 		assertEquals(pastMeeting.getContacts().size(), 1);
 	}
 	
-		/********************************************************************
-		*	TESTS FOR List<Meeting> getFutureMeetingList(Contact contact)	*
-		********************************************************************/
+		/**********************************************************************
+		*    TESTS FOR List<Meeting> getFutureMeetingList(Contact contact)    *
+		**********************************************************************/
 	//Tests basic functionality of getFutureMeetingList(Contact contact)
 	@Test
 	public void testsGetFutureMeetingListContact() {
@@ -191,9 +191,9 @@ public class ContactManagerTest {
 		assertEquals(manager.getFutureMeetingList(futureDate).size(), 1);
 	}
 	
-		/********************************************************************
-		*	TESTS FOR List<PastMeeting> getPastMeetingList(Contact contact)	*
-		********************************************************************/
+		/************************************************************************
+		*    TESTS FOR List<PastMeeting> getPastMeetingList(Contact contact)    *
+		************************************************************************/
 	//Tests basic functionality of getPastMeetingList()
 	@Test
 	public void testsGetPastMeetingList() {
@@ -207,9 +207,9 @@ public class ContactManagerTest {
 		manager.getPastMeetingList(contact);
 	}
 	
-		/****************************************************************************************
-		*	TESTS FOR void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text)	*
-		****************************************************************************************/
+		/********************************************************************************************
+		*    TESTS FOR void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text)    *
+		********************************************************************************************/
 	//Tests basic functionality of addNewPastMeeting()
 	@Test
 	public void testsAddNewPastMeeting() {
@@ -242,9 +242,9 @@ public class ContactManagerTest {
 	public void testsAddNewPastMeetingUnknownContact() {
 		manager.addNewPastMeeting(contacts, pastDate, "");
 	}
-		/********************************************************
-		*	TESTS FOR void addMeetingNotes(int id, String text)	*
-		********************************************************/
+		/************************************************************
+		*    TESTS FOR void addMeetingNotes(int id, String text)    *
+		************************************************************/
 	//Tests add notes to past meeting
 	@Test
 	public void testsAddMeetingPastNotes() {
@@ -266,8 +266,37 @@ public class ContactManagerTest {
 	}
 	//Tests for null notes
 	@Test (expected = NullPointerException.class)
-	public void testsAddMeetingNotesNullDate() {
+	public void testsAddMeetingNotesNullNotes() {
 		String notes = null;
 		manager.addMeetingNotes(pastId, notes);
+	}
+		/****************************************************************
+		*    TESTS FOR void addNewContact(String name, String notes)    *
+		****************************************************************/
+	//Tests basic functionality of addNewContact()
+	@Test
+	public void testsAddNewContact() {
+		manager.addNewContact("Mike", "Notes");
+		assertEquals(manager.getContacts("Mike").size(), 1);
+	}
+	//Tests for null name
+	@Test (expected = NullPointerException.class)
+	public void testsAddNewContactNullName() {
+		String name = null;
+		manager.addNewContact(name, "Notes");
+	}
+	//Tests for null notes
+	@Test (expected = NullPointerException.class)
+	public void testsAddNewContactNullNotes() {
+		String notes = null;
+		manager.addNewContact("Mike", notes);
+	}
+		/*******************************************************
+		*    TESTS FOR Set<Contact> getContacts(int... ids)    *
+		*******************************************************/
+	//Tests for unknown contact
+	@Test (expected = IllegalArgumentException.class)
+	public void testsGetContactsUnknownContact() {
+		manager.getContacts(-1);
 	}
 }

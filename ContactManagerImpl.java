@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
 /**
 * A class to manage your contacts and meetings.
 */

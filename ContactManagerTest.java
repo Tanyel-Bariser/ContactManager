@@ -10,10 +10,11 @@ import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ContactManagerTest {
 	private ContactManager manager;
-	private Contact contact1, contact2;
+	private Contact contact, pastContact, futureContact;
 	private Set<Contact> contacts;
 	private Calendar futureDate, pastDate;
 	private int futureId, pastId;
@@ -21,11 +22,9 @@ public class ContactManagerTest {
 	@Before
 	public void buildUp() {
 		manager = new ContactManagerImpl();
-		contact1 = new ContactImpl("Tanyel");
-		contact2 = new ContactImpl("John");
+		contact = new ContactImpl("John");
 		contacts = new HashSet<Contact>();
-		contacts.add(contact1);
-		contacts.add(contact2);
+		contacts.add(contact);
 		pastDate = Calendar.getInstance();
 		futureDate = Calendar.getInstance();
 		pastDate.set(2000, 1, 1);
@@ -35,17 +34,20 @@ public class ContactManagerTest {
 		manager.addNewPastMeeting(manager.getContacts("pastJake"), pastDate, "Notes");
 		futureId = manager.addFutureMeeting(manager.getContacts("futureJake"), futureDate);
 		pastId = getsMeetingId(pastDate);
+		pastContact = getContact("pastJake");
+		futureContact = getContact("futureJake");
 	}
 	@After
 	public void cleanUp() {
 		manager = null;
-		contact1 = null;
-		contact2 = null;
+		contact = null;
 		contacts = null;
 		pastDate = null;
 		futureDate = null;
 		futureId = -1;
 		pastId = -1;
+		pastContact = null;
+		futureContact = null;
 	}
 	//Returns the ID number for int pastId in buildUp()
 	private int getsMeetingId(Calendar pastDate) {
@@ -167,15 +169,77 @@ public class ContactManagerTest {
 		/********************************************************************
 		*	TESTS FOR List<Meeting> getFutureMeetingList(Contact contact)	*
 		********************************************************************/
-	//Tests basic functionality of getFutureMeetingList()
+	//Tests basic functionality of getFutureMeetingList(Contact contact)
 	@Test
-	public void testsGetFutureMeetingList() {
-		assertEquals(manager.getFutureMeetingList(getContact("futureJake")).size(), 1); 
-		assertEquals(manager.getFutureMeetingList(getContact("pastJake")).size(), 0);
+	public void testsGetFutureMeetingListContact() {
+		assertEquals(manager.getFutureMeetingList(futureContact).size(), 1); 
+		assertEquals(manager.getFutureMeetingList(pastContact).size(), 0);
 	}
 	//Tests for unknown contact
 	@Test (expected = IllegalArgumentException.class)
 	public void testsGetFutureMeetingListUnknownContact() {
-		manager.getFutureMeetingList(contact1);
+		manager.getFutureMeetingList(contact);
+	}
+	
+		/****************************************************************
+		*	TESTS FOR List<Meeting> getFutureMeetingList(Calendar date)	*
+		****************************************************************/
+	//Tests basic functionality of getFutureMeetingList(Calendar date)
+	@Test
+	public void testsGetFutureMeetingListDate() {
+		assertEquals(manager.getFutureMeetingList(pastDate).size(), 1);
+		assertEquals(manager.getFutureMeetingList(futureDate).size(), 1);
+	}
+	
+		/********************************************************************
+		*	TESTS FOR List<PastMeeting> getPastMeetingList(Contact contact)	*
+		********************************************************************/
+	//Tests basic functionality of getPastMeetingList()
+	@Test
+	public void testsGetPastMeetingList() {
+		assertEquals(manager.getPastMeetingList(pastContact), manager.getFutureMeetingList(pastDate));
+		assertTrue(manager.getPastMeetingList(futureContact).isEmpty());
+		assertEquals(manager.getPastMeetingList(pastContact).size(), 1);
+	}
+	//Tests for unknown contact
+	@Test (expected = IllegalArgumentException.class)
+	public void testsGetPastMeetingListUnknownContact() {
+		manager.getPastMeetingList(contact);
+	}
+	
+		/****************************************************************************************
+		*	TESTS FOR void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text)	*
+		****************************************************************************************/
+	//Tests basic functionality of addNewPastMeeting
+	@Test
+	public void testsAddNewPastMeeting() {
+		manager.addNewPastMeeting(manager.getContacts("pastJake"), pastDate, "New notes");
+		//The line above just created the second meeting that takes place on pastDate
+		assertEquals(manager.getFutureMeetingList(pastDate).size(), 2);
+		//Only one contact in ContactManager manager with name "pastJake"
+		assertEquals(manager.getContacts("pastJake").size(), 1);
+	}
+	//Test for null date
+	@Test(expected = NullPointerException.class)
+	public void testsAddNewPastMeetingNullDate() {
+		pastDate = null;
+		manager.addNewPastMeeting(manager.getContacts("pastJake"), pastDate, "");
+	}
+	//Tests for null contacts
+	@Test(expected = NullPointerException.class)
+	public void testsAddNewPastMeetingNullContacts() {
+		contacts = null;
+		manager.addNewPastMeeting(contacts, pastDate, "");
+	}
+	//Tests for empty contacts set
+	@Test(expected = IllegalArgumentException.class)
+	public void testsAddNewPastMeetingEmptyContacts() {
+		contacts.remove(contacts);
+		manager.addNewPastMeeting(contacts, pastDate, "");
+	}
+	//Tests for unknown contact
+	@Test(expected = IllegalArgumentException.class)
+	public void testsAddNewPastMeetingUnknownContact() {
+		manager.addNewPastMeeting(contacts, pastDate, "");
 	}
 }

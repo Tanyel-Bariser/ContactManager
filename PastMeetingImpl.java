@@ -7,7 +7,7 @@ import java.io.Serializable;
 * It includes your notes about what happened and what was agreed.
 */
 public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
-    private String notes = "";
+    private StringBuilder notes;
 	
     /**
     * Constructor with no parameters to make class serialisable
@@ -22,7 +22,7 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
     */
     public PastMeetingImpl(Set<Contact> contacts, Calendar date, String note) {
         super(contacts, date);
-        notes += note + "\n";
+        notes = new StringBuilder(note + "\n");
     }
     /**
     * Constructor which takes ID as argument
@@ -36,7 +36,7 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
     */
     public PastMeetingImpl(int id, Set<Contact> contacts, Calendar date, String note) {
         super(id, contacts, date);
-        notes += note + "\n";
+        notes = new StringBuilder(note + "\n");
     }
     /**
     * Returns the notes from the meeting.
@@ -46,7 +46,7 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
     * @return the notes from the meeting.
     */
     public String getNotes() {
-        return notes;
+        return notes.toString();
     }
     /**
     * Adds notes to past meeting
@@ -54,6 +54,6 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
     * @param note for past meeting
     */
     public void addNotes(String note) {
-        notes += note + "\n";
+        notes.append(note + "\n");
     }
 }

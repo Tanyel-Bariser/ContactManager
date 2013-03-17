@@ -11,7 +11,9 @@ public class ContactImpl implements Contact, Serializable {
     private String name;
     private String notes;
 	
-    //Constructor with no parameters as an attempt to make class serialisable
+    /**
+    * Constructor with no parameters to make class serialisable
+    */
     public ContactImpl() {}
     /**
     * Constructor for contact

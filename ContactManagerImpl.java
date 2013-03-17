@@ -157,7 +157,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     *
     * @param id of meeting
     * @param meeting to check for date
-    * @throws NullPointerException if meeting or date points to null
+    * @throws NullPointerException if date points to null
     * @throws IllegalStateException if meeting is set in future
     * @throws IllegalArgumentException if meeting is unknown
     */

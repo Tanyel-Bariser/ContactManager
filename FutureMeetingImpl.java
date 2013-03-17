@@ -5,7 +5,7 @@ import java.io.Serializable;
 * A meeting to be held in the future
 */
 public class FutureMeetingImpl extends MeetingImpl implements FutureMeeting, Serializable {
-    //This class is only necessary for type checking and/or downcasting
+    //This class is only necessary for type checking
 	
     /**
     * Constructor with no parameters to make class serialisable

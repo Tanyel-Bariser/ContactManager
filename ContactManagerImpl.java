@@ -255,8 +255,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         List<Meeting> meetingsList = new LinkedList<>();
         for (Meeting meeting : idMeetingsMap.values()) {
             boolean meetingOnDate = meeting.getDate().equals(date);
-            boolean noDuplicates = !meetingsList.contains(meeting);
-            if (meetingOnDate && noDuplicates) {
+            boolean notDuplicate = !meetingsList.contains(meeting);
+            if (meetingOnDate && notDuplicate) {
                 meetingsList.add(meeting);
             }
         }
@@ -297,7 +297,7 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * duplicates.
     *
     * @param contact one of the user’s contacts
-    * @return the list of future meeting(s) scheduled with this contact (maybe empty).
+    * @return the list of past meeting(s) scheduled with this contact (maybe empty).
     * @throws IllegalArgumentException if the contact does not exist
     * @throws NullPointerException if contact points to null
     */
@@ -307,7 +307,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         for (Meeting meeting : idMeetingsMap.values()) {
             boolean meetingContainsContact = meeting.getContacts().contains(contact);
             boolean meetingIsInPast = meeting.getDate().before(currentTime);
-            if (meetingContainsContact && meetingIsInPast) {
+            boolean notDuplicate = !contactPastMeetings.contains(meeting);
+            if (meetingContainsContact && meetingIsInPast && notDuplicate) {
                 if (!(meeting instanceof PastMeeting)) {
                     int id = meeting.getId();
                     //Converts this meeting from FutureMeeting type to PastMeeting type

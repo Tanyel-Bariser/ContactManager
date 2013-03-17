@@ -107,20 +107,6 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         }
     }
     /**
-    * Checks whether a specified meeting is known
-    * 
-    * @param meeting to be checked whether it is known
-    * @throws NullPointerException if meeting points to null
-    * @throws IllegalArgumentException if meeting is unknown
-    */
-    private void checkMeetingIsKnown(Meeting meeting) {
-        if (meeting == null) {
-            throw new NullPointerException("Meeting points to null.");
-        } else if (!idMeetingsMap.containsValue(meeting)) {
-            throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " is unknown.");
-        }
-    }
-    /**
     * Checks date for null
     *
     * @param date to check for null
@@ -169,16 +155,19 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     /**
     * Throws IllegalStateException if meeting is set in future.
     *
+    * @param id of meeting
     * @param meeting to check for date
     * @throws NullPointerException if meeting or date points to null
     * @throws IllegalStateException if meeting is set in future
     * @throws IllegalArgumentException if meeting is unknown
     */
-    private void illegalStateIfFuture(Meeting meeting) {
-        checkMeetingIsKnown(meeting);
+    private void illegalStateIfFuture(int id, Meeting meeting) {
+        if (meeting == null) {
+            throw new IllegalArgumentException("Meeting with ID number " + id + " is unknown.");
+        }
         checkForNull(meeting.getDate());
         if (meeting.getDate().after(currentTime)) {
-            throw new IllegalStateException("Meeting with ID " + meeting.getId() + " is set for a date in the future.");
+            throw new IllegalStateException("Meeting with ID " + id + " is set for a date in the future.");
         }
     }
     /**
@@ -222,12 +211,12 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     * @param text messages to be added about the meeting.
     * @throws IllegalArgumentException if the meeting does not exist
     * @throws IllegalStateException if the meeting is set for a date in the future
-    * @throws NullPointerException if the notes, meeting or date are null
+    * @throws NullPointerException if the notes or date are null
     */
     public void addMeetingNotes(int id, String text) {
         Meeting meeting = getMeeting(id);
         checkForNull(text);
-        illegalStateIfFuture(meeting);
+        illegalStateIfFuture(id, meeting);
         if (meeting instanceof PastMeetingImpl) {
             //Downcast to use addNotes()
             PastMeetingImpl sameMeeting = (PastMeetingImpl) meeting;

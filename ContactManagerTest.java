@@ -245,11 +245,29 @@ public class ContactManagerTest {
 		/********************************************************
 		*	TESTS FOR void addMeetingNotes(int id, String text)	*
 		********************************************************/
-	//Tests basic functionality of addMeetingNotes()
+	//Tests add notes to past meeting
 	@Test
-	public void testsAddMeetingNotes() {
+	public void testsAddMeetingPastNotes() {
 		manager.addMeetingNotes(pastId, "New notes");
 		PastMeeting pastMeeting = (PastMeeting) manager.getMeeting(pastId);
 		assertEquals(pastMeeting.getNotes(), "Notes\nNew notes\n");
+	}
+	//Tests for future date
+	@Test (expected = IllegalStateException.class)
+	public void testsAddMeetingIllegalState() {
+		manager.addMeetingNotes(futureId, "New notes");
+	}
+	//Tests for unknown meeting
+	@Test (expected = IllegalArgumentException.class)
+	public void testsAddMeetingNotesUnknownMeeting() {
+		Meeting unknownMeeting = new FutureMeetingImpl(contacts, futureDate);
+		int id = unknownMeeting.getId();
+		manager.addMeetingNotes(id, "");
+	}
+	//Tests for null notes
+	@Test (expected = NullPointerException.class)
+	public void testsAddMeetingNotesNullDate() {
+		String notes = null;
+		manager.addMeetingNotes(pastId, notes);
 	}
 }

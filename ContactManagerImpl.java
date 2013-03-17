@@ -27,6 +27,9 @@ public class ContactManagerImpl implements ContactManager, Serializable {
     private Map<Integer, Meeting> idMeetingsMap;
     private Calendar currentTime = Calendar.getInstance();
 	
+    /**
+    * Constructor method for ContactManagerImpl
+    */
     public ContactManagerImpl() {
         if (new File(FILE).exists()) {
             read();
@@ -35,7 +38,11 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             idMeetingsMap = new HashMap<>();
         }
     }
-    //Suppresses due to unchecked casts.
+    /**
+    * Reads from file contacts.txt
+    *
+    * Suppresses warnings due to unchecked casts.
+    */
     @SuppressWarnings("unchecked")
     public void read() {
         try (ObjectInputStream input = new ObjectInputStream(
@@ -51,13 +58,22 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         }
     }
 
+	
+	
                 /******************************************
                 *    METHODS THAT CHECK FOR EXCEPTIONS    *
                 ******************************************/
-    //Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
+    /**
+    * Takes a set of contacts as argument and complains if one or more contact(s) is null/empty/unknown.
+    * 
+    * @param contacts set to check whether they are known by instance of ContactManagerImpl
+    * @throws NullPointerException if set of contacts point to null
+    * @throws IllegalArgumentException if set of contacts is empty
+    * @throws IllegalArgumentException if one or more contact(s) is unknown
+    */
     private void checkContactsAreKnown(Set<Contact> contacts) {
         if (contacts == null) {
-            throw new NullPointerException("Set of contacts points to null");
+            throw new NullPointerException("Set of contacts point to null");
         } else if (contacts.isEmpty()) {
             throw new IllegalArgumentException("Set of contacts is empty.");
         }
@@ -68,7 +84,13 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             }
         }
     }
-    //Takes one contact as argument and complains if contact is null/unknown.
+    /**
+    * Takes one contact as argument and complains if contact is null/unknown.
+    * 
+    * @param contact to check whether is known by instance of ContactManagerImpl
+    * @throws NullPointerException if contact points to null
+    * @throws IllegalArgumentException if contact is unknown
+    */
     private void checkContactIsKnown(Contact contact) {
         if (contact == null) {
             throw new NullPointerException("Contact points to null");
@@ -76,43 +98,83 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             throw new IllegalArgumentException(contact.getName() + " is an unknown contact");
         }
     }
-    //Following three methods checks date, text & meeting arguments for null, respectively.
+    /**
+    * Checks date for null
+    *
+    * @param date to check for null
+    * @throws NullPointerException if date points to null
+    */
     private void checkForNull(Calendar date) {
         if (date == null) {
             throw new NullPointerException("Date points to null");
         }
     }
+    /**
+    * Checks text, i.e. name or notes, for null
+    *
+    * @param text to check for null
+    * @throws NullPointerException if text points to null
+    */
     private void checkForNull(String text) {
         if (text == null) {
             throw new NullPointerException("Text, i.e. name or notes, points to null");
         }
     }
+    /**
+    * Checks meeting for null
+    *
+    * @param meeting to check for null
+    * @throws IllegalArgumentException if meeting points to null
+    */
     private void checkForNull(Meeting meeting) {
         if (meeting == null) {
             throw new IllegalArgumentException("Meeting with ID " + meeting.getId() + " points to null.");
         }
     }
-    //Following two methods makes sure dates are in the past or future, respectively.
+    /**
+    * Makes sure date is in the past.
+    *
+    * @param date to check if is in past
+    * @throws IllegalArgumentException if date is in the future
+    */
     private void complainIfFuture(Calendar date) {
         checkForNull(date);
         if (date.after(currentTime)) {
             throw new IllegalArgumentException("Date of meeting should be in the past.");
         }
     }
+    /**
+    * Makes sure date is in the future.
+    *
+    * @param date to check if is in future
+    * @throws IllegalArgumentException if date is in the past
+    */
     private void complainIfPast(Calendar date) {
         checkForNull(date);
         if (date.before(currentTime)) {
             throw new IllegalArgumentException("Date of meeting should be in the future.");
         }
     }
-    //Throws IllegalStateException if meeting is set in future.
+    /**
+    * Throws IllegalStateException if meeting is set in future.
+    *
+    * @param meeting to check for date
+    * @throws NullPointerException if date points to null
+    * @throws IllegalStateException if meeting is set in future
+    */
     private void illegalStateIfFuture(Meeting meeting) {
         checkForNull(meeting);
         if (meeting.getDate().after(currentTime)) {
             throw new IllegalStateException("Meeting with ID " + meeting.getId() + " is set for a date in the future.");
         }
     }
-    //Checks that an integer array (specifically IDs) is not empty.
+    /**
+    * Checks that an integer array (specifically IDs) is not empty.
+    * 
+    * @param ids the array of contacts IDs
+    * @throws NullPointerException if contacts IDs points to null
+    * @throws IllegalArgumentException if contacts IDs is empty
+    */
     private void checkIDsForEmpty(int[] ids) {
         if (ids == null) {
             throw new NullPointerException("Contact IDs points to null.");
@@ -120,12 +182,19 @@ public class ContactManagerImpl implements ContactManager, Serializable {
             throw new IllegalArgumentException("Contact IDs is empty.");
         }
     }
-    //Checks that a contact id is known
+    /**
+    * Checks that a contact id is known.
+    * 
+    * @param id the ID of the contact
+    * @throws IllegalArgumentException if contact's id is unknown
+    */
     private void checkContactIdIsKnown(int id) {	
         if (!idContactsMap.containsKey(id)) {
             throw new IllegalArgumentException("ID: " + id + " is unknown.");
         }
     }
+	
+	
 	
                 /***********************
                 *    MEETING METHODS   *
@@ -190,6 +259,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         Collections.sort(meetingsList, new DateMeetingComparator());
         return meetingsList;
     }
+	
+	
 	
                 /****************************
                 *    PASTMEETING METHODS    *
@@ -262,6 +333,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         idMeetingsMap.put(id, pastMeeting);
     }
 	
+	
+	
                 /******************************
                 *    FUTUREMEETING METHODS    *
                 ******************************/
@@ -322,6 +395,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         return contactFutureMeetings;
     }
 	
+	
+	
                 /************************
                 *    CONTACT METHODS    *
                 ************************/
@@ -374,6 +449,8 @@ public class ContactManagerImpl implements ContactManager, Serializable {
         }
         return contacts;
     }
+	
+	
 	
                 /******************************
                 *    SAVE ALL DATA TO DISK    *
